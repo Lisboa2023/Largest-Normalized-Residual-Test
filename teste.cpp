@@ -1,9 +1,11 @@
 //Largest resiudal normalized
+//
 
 #include<iostream>
 
 using namespace std;
 
+void calculateNormalizedResidue();
 void detectError(int, float[], float &, int &);
 void delError(int, int, float[], float*, float, int p);
 void print(int, float[]);
@@ -27,6 +29,12 @@ int main(){
     return 0;
 }
 
+void calculateNormalizedResidue(float rn[], int size){
+    for(int i = 0; i < size; i++){
+        rn[i] = abs(r[i])/sqrt(cm[i][i]);
+    }
+}
+
 void detectError(int size, float array[], float &temp, int &position){
     temp = array[0];
     for(int i = 0; i < size; i++){
@@ -38,12 +46,7 @@ void detectError(int size, float array[], float &temp, int &position){
 }
 
 void delError(int size, int threshold, float array[], float *ptr, float lg, int p){
-    int j = 0;
-    for (int i = 0; i < size; i++){
-        if(lg > threshold){
-            if(i != p)
-            ptr[j] = array[i];
-            j++;
+
         }
     }
 }
