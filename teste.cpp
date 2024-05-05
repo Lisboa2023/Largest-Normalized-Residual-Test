@@ -54,21 +54,21 @@ int main(){
 
 void calculateResidualArray(int size, float *r, float *measurement, float *mEstimated){
     for(int i = 0; i < size; i++){
-        *(r+i) = *(measurement+i) - *(mEstimated+i);
+        r[i] = measurement[i] - mEstimated[i];
     }
 }
 
 void calculateNormalizedResidual(float *rn, float *r, double cm[][tam], int size){
     for(int i = 0; i < size; i++){
-        *(rn+i) = abs(*(r+i))/sqrt(cm[i][i]);
+        rn[i] = abs(r[i])/sqrt(cm[i][i]);
     }
 }
 
 void findLargestResidual(int size, float *array, float &temp, int &pos){
     temp = *array;
     for(int i = 0; i < size; i++){
-        if(*(array+i) >= temp){
-            temp = *(array + i);
+        if(array[i] >= temp){
+            temp = array[i];
             pos = i;
         }
     }
@@ -76,7 +76,7 @@ void findLargestResidual(int size, float *array, float &temp, int &pos){
 
 void deletError(int threshold, float *array, float lg, int p){
     if(lg > threshold){
-        *(array+p) = 0;
+        array[p] = 0;
     }  
 }
 
