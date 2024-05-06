@@ -10,15 +10,13 @@ using std::endl;
 using std::setprecision;
 using std::setw;
 
-const int tam = 5; 
-
 void calculateResidualArray(int, float *, float *, float *);
-void calculateNormalizedResidual(float *, float *, double [][tam], int);
+void calculateNormalizedResidual(float *, float *, double *, int);
 void findLargestResidual(int, float *, float &, int &);
 void deletError(int, float *, float, int);
 void print(int, float *);
 void print(float);
-void print(int, double [][tam]);
+void print(int, double *);
 
 int main(){
     const int size = 5;
@@ -31,12 +29,14 @@ int main(){
                                        {0,0,0, 0.000006805,0},
                                        {0,0,0,0, 0.0000405}};
 
+    double *cmPtr = covarianceMatrix[0];
+
     // float residualArray[] = {0.0286, 0.0235, 0.006, -0.006, 0.007};
     float residualArray[size];
     float normalizedArray[size];
 
     calculateResidualArray(size, residualArray, measurementArray, estimatedMeasurements);
-    calculateNormalizedResidual(normalizedArray, residualArray, covarianceMatrix, size);
+    calculateNormalizedResidual(normalizedArray, residualArray, cmPtr, size);
     print(size, normalizedArray);
 
     float largestResidual;
@@ -54,21 +54,21 @@ int main(){
 
 void calculateResidualArray(int size, float *r, float *measurement, float *mEstimated){
     for(int i = 0; i < size; i++){
-        r[i] = measurement[i] - mEstimated[i];
+        *(r+i) = *(measurement+i) - *(mEstimated+i);
     }
 }
 
-void calculateNormalizedResidual(float *rn, float *r, double cm[][tam], int size){
+void calculateNormalizedResidual(float *rn, float *r, double *cm, int size){
     for(int i = 0; i < size; i++){
-        rn[i] = abs(r[i])/sqrt(cm[i][i]);
+        *(rn+i) = abs(*(r+i))/sqrt(cm[i*size + i]);
     }
 }
 
 void findLargestResidual(int size, float *array, float &temp, int &pos){
     temp = *array;
     for(int i = 0; i < size; i++){
-        if(array[i] >= temp){
-            temp = array[i];
+        if(*(array+i) >= temp){
+            temp = *(array + i);
             pos = i;
         }
     }
@@ -76,7 +76,7 @@ void findLargestResidual(int size, float *array, float &temp, int &pos){
 
 void deletError(int threshold, float *array, float lg, int p){
     if(lg > threshold){
-        array[p] = 0;
+        *(array+p) = 0;
     }  
 }
 
@@ -88,10 +88,10 @@ void print(int size, float *ptr){
     cout << endl;
 }
 
-void print(int size, double ptr[][tam]){
+void print(int size, double *ptr){
     for(int i = 0; i<size; i++){
         for(int j=0; j<size; j++){
-            cout << setw(10) << setprecision(2) << ptr[i][j] << "\t";
+            cout << setw(10) << setprecision(2) << ptr[i*size + j] << "\t";
         }
 
         cout << endl;
