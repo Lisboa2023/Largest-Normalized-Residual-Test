@@ -76,7 +76,7 @@ void NormalizedResidual::LargestNormalizedResidualTest(const float *measurementA
 
 void NormalizedResidual::print(const float *ptr){
     for(int i = 0; i<size; i++){
-        cout << setw(10) << setprecision(2) << ptr[i] ;
+        cout << setw(10) << setprecision(3) << ptr[i] ;
     }
 
     cout << endl;
