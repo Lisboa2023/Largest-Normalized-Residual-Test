@@ -9,9 +9,9 @@ using std::endl;
 using std::setprecision;
 using std::setw;
 
-NormalizedResidual::NormalizedResidual(const int SIZE, const float THERSHOLD){
+NormalizedResidual::NormalizedResidual(const int SIZE, const float THRESHOLD){
     setNumberOfMeasurements(SIZE);
-    setThershold(THERSHOLD);
+    setThershold(THRESHOLD);
 
     residualArray = new float[SIZE];
     normalizedArray = new float[SIZE];
@@ -26,8 +26,8 @@ void NormalizedResidual::setNumberOfMeasurements(const int SIZE){
     size = SIZE;
 }
 
-void NormalizedResidual::setThershold(const float THERSHOLD){
-    threshold = THERSHOLD;
+void NormalizedResidual::setThershold(const float THRESHOLD){
+    threshold = THRESHOLD;
 }
 
 void NormalizedResidual::calculateResidualArray(const float *measurement, const float *mEstimated){
