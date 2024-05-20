@@ -54,24 +54,24 @@ void NormalizedResidual::findLargestResidual(float &temp, int &pos){
 
 void NormalizedResidual::deletError(const int threshold, const float lg, const int p){
     if(lg > threshold){
-        normalizedArray[p] = 0;
+        measurement[p] = 0;
+        mEstimated[p] = 0;
     }  
 }
 
 void NormalizedResidual::LargestNormalizedResidualTest(const float *measurementArray, const float *estimatedArray, const double *covarianceMatrix){
-    
-    calculateResidualArray(measurementArray, estimatedArray);
-    calculateNormalizedResidualArray(residualArray, covarianceMatrix);
-    print(normalizedArray);
 
     float largestResidual;
     int position;
 
     for(int i=0; i<size; i++){
+        calculateResidualArray(measurementArray, estimatedArray);
+        calculateNormalizedResidualArray(residualArray, covarianceMatrix);
+        print(normalizedArray);
         findLargestResidual(largestResidual, position); 
         deletError(threshold, largestResidual, position);
+        print(normalizedArray);
     }
-    print(normalizedArray);
 }
 
 void NormalizedResidual::print(const float *ptr){
