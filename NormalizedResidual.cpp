@@ -13,11 +13,15 @@ NormalizedResidual::NormalizedResidual(const int SIZE, const float THRESHOLD){
     setNumberOfMeasurements(SIZE);
     setThershold(THRESHOLD);
 
+    measurement = new float[SIZE];
+    estimatedMeasurement = new float[SIZE];
     residualArray = new float[SIZE];
     normalizedArray = new float[SIZE];
 }
 
 NormalizedResidual::~NormalizedResidual(){
+    delete [] measurement;
+    delete [] estimatedMeasurement;
     delete [] residualArray;
     delete [] normalizedArray;
 }
@@ -30,15 +34,23 @@ void NormalizedResidual::setThershold(const float THRESHOLD){
     threshold = THRESHOLD;
 }
 
-void NormalizedResidual::calculateResidualArray(const float *measurement, const float *mEstimated){
+void NormalizedResidual::setMeasurementArray(float *measurementArray){
+    measurement = measurementArray;
+}
+
+void NormalizedResidual::setEstimatedMeasurementArray(float *estimatedArray){
+    estimatedMeasurement = estimatedArray;
+}
+
+void NormalizedResidual::calculateResidualArray(){
     for(int i = 0; i < size; i++){
-        residualArray[i] = measurement[i] - mEstimated[i];
+        residualArray[i] = measurement[i] - estimatedMeasurement[i];
     }
 }
 
-void NormalizedResidual::calculateNormalizedResidualArray(const float *r, const double *cm){
+void NormalizedResidual::calculateNormalizedResidualArray(const double *cm){
     for(int i = 0; i < size; i++){
-        normalizedArray[i] = abs(r[i])/sqrt(cm[i*size + i]);
+        normalizedArray[i] = abs(residualArray[i])/sqrt(cm[i*size + i]);
     }
 }
 
@@ -55,19 +67,21 @@ void NormalizedResidual::findLargestResidual(float &temp, int &pos){
 void NormalizedResidual::deletError(const int threshold, const float lg, const int p){
     if(lg > threshold){
         measurement[p] = 0;
-        mEstimated[p] = 0;
+        estimatedMeasurement[p] = 0;
     }  
 }
 
-void NormalizedResidual::LargestNormalizedResidualTest(const float *measurementArray, const float *estimatedArray, const double *covarianceMatrix){
+void NormalizedResidual::LargestNormalizedResidualTest(float *measurementArray, float *estimatedArray, const double *covarianceMatrix){
+
+    setMeasurementArray(measurementArray);
+    setEstimatedMeasurementArray(estimatedArray);
 
     float largestResidual;
     int position;
 
     for(int i=0; i<size; i++){
-        calculateResidualArray(measurementArray, estimatedArray);
-        calculateNormalizedResidualArray(residualArray, covarianceMatrix);
-        print(normalizedArray);
+        calculateResidualArray();
+        calculateNormalizedResidualArray(covarianceMatrix);
         findLargestResidual(largestResidual, position); 
         deletError(threshold, largestResidual, position);
         print(normalizedArray);
