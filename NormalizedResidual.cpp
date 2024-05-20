@@ -48,9 +48,9 @@ void NormalizedResidual::calculateResidualArray(){
     }
 }
 
-void NormalizedResidual::calculateNormalizedResidualArray(const double *cm){
+void NormalizedResidual::calculateNormalizedResidualArray(const double *covarianceMatrix){
     for(int i = 0; i < size; i++){
-        normalizedArray[i] = abs(residualArray[i])/sqrt(cm[i*size + i]);
+        normalizedArray[i] = abs(residualArray[i])/sqrt(covarianceMatrix[i*size + i]);
     }
 }
 
