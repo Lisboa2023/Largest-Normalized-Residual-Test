@@ -13,15 +13,19 @@ class NormalizedResidual{
         void setEstimatedMeasurementArray(float *);
         void setResidualArray(float *);
         void setNormalizedArray(float *);
+        void setSensitivityMatrix(float *);
+        void setResidualCovarianceMatrix(float *);
         //=======================================================================
         
+        void calculateSensitivityMatrix(const double *);
+        void calculateResidualCovarianceMatrix(const double *);
         void calculateResidualArray();
-        void calculateNormalizedResidualArray(const double *);
+        void calculateNormalizedResidualArray();
         void findLargestResidual(float &, int &);
         void deleteError(const int, const float, const int);
         void print(const float *);
 
-        void LargestNormalizedResidualTest(float *, float *, const double*);
+        void LargestNormalizedResidualTest(float *, float *, const double *, const double *);
         
     private:
         int size;
@@ -30,6 +34,8 @@ class NormalizedResidual{
         float *estimatedMeasurement;
         float *residualArray;
         float *normalizedArray;
+        float *sensitivityMatrix;
+        float *residualCovarianceMatrix;
 };
 
 #endif
