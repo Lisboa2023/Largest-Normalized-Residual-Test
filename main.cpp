@@ -17,7 +17,7 @@ int main(){
     //                                    {0,0,0,0, 0.0000405}};
 
     const int size = 4;
-    const float thershold = 3.0;
+    const float threshold = 3.0;
 
     float measurementArray[] = {3.90, -4.05, -0.48, 2.04};
     float estimatedMeasurement[] = {3.992, -3.61, -0.374, 2.09};
@@ -28,7 +28,7 @@ int main(){
 
     const double *cmPtr = covarianceMatrix[0];
 
-    NormalizedResidual LNRTest(size,thershold);
+    NormalizedResidual LNRTest(size,threshold);
     LNRTest.LargestNormalizedResidualTest(measurementArray, estimatedMeasurement, cmPtr);
 
     return 0;

@@ -6,17 +6,23 @@ class NormalizedResidual{
         NormalizedResidual(const int, const float);
         ~NormalizedResidual();
 
+        //Funcoes SET ============================================================
         void setNumberOfMeasurements(const int);
         void setThershold(const float);
         void setMeasurementArray(float *);
         void setEstimatedMeasurementArray(float *);
+        void setResidualArray(float *);
+        void setNormalizedArray(float *);
+        //=======================================================================
+        
         void calculateResidualArray();
         void calculateNormalizedResidualArray(const double *);
         void findLargestResidual(float &, int &);
-        void deletError(const int, const float, const int);
-        void LargestNormalizedResidualTest(float *, float *, const double*);
+        void deleteError(const int, const float, const int);
         void print(const float *);
 
+        void LargestNormalizedResidualTest(float *, float *, const double*);
+        
     private:
         int size;
         float threshold;
