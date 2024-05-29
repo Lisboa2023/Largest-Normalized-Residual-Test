@@ -5,7 +5,7 @@
 
 NormalizedResidual::NormalizedResidual(const int SIZE, const float THRESHOLD){
     setNumberOfMeasurements(SIZE);
-    setThershold(THRESHOLD);
+    setThreshold(THRESHOLD);
 
     measurement = new float[SIZE];
     estimatedMeasurement = new float[SIZE];
@@ -25,7 +25,7 @@ void NormalizedResidual::setNumberOfMeasurements(const int SIZE){
     size = SIZE;
 }
 
-void NormalizedResidual::setThershold(const float THRESHOLD){
+void NormalizedResidual::setThreshold(const float THRESHOLD){
     threshold = THRESHOLD;
 }
 

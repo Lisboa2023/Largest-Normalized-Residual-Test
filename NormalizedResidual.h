@@ -8,7 +8,7 @@ class NormalizedResidual{
 
         //Funcoes SET ============================================================
         void setNumberOfMeasurements(const int);
-        void setThershold(const float);
+        void setThreshold(const float);
         void setMeasurementArray(float *);
         void setEstimatedMeasurementArray(float *);
         void setResidualArray(float *);
