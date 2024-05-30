@@ -5,12 +5,15 @@
 
 NormalizedResidual::NormalizedResidual(const int SIZE, const float THRESHOLD){
     setNumberOfMeasurements(SIZE);
-    setThershold(THRESHOLD);
+    setThreshold(THRESHOLD);
 
     measurement = new float[SIZE];
     estimatedMeasurement = new float[SIZE];
     residualArray = new float[SIZE];
     normalizedArray = new float[SIZE];
+    hatMatrix = new float[size*size];
+    sensitivityMatrix = new float[size*size];
+    residualCovarianceMatrix = new float[size*size];
 }
 
 NormalizedResidual::~NormalizedResidual(){
@@ -18,6 +21,9 @@ NormalizedResidual::~NormalizedResidual(){
     delete [] estimatedMeasurement;
     delete [] residualArray;
     delete [] normalizedArray;
+    delete [] hatMatrix;
+    delete [] sensitivityMatrix;
+    delete [] residualCovarianceMatrix;
 }
 
 //Funcoes SET ==========================================================================================
@@ -25,7 +31,7 @@ void NormalizedResidual::setNumberOfMeasurements(const int SIZE){
     size = SIZE;
 }
 
-void NormalizedResidual::setThershold(const float THRESHOLD){
+void NormalizedResidual::setThreshold(const float THRESHOLD){
     threshold = THRESHOLD;
 }
 
@@ -52,9 +58,19 @@ void NormalizedResidual::setSensitivityMatrix(float *sMatrix){
 void NormalizedResidual::setResidualCovarianceMatrix(float *rcMatrix){
     residualCovarianceMatrix = rcMatrix;
 }
+
+void NormalizedResidual::setHatMatrix(float *hMatrix){
+    hatMatrix = hMatrix;
+}
 //=============================================================================================
 
-void NormalizedResidual::calculateSensitivityMatrix(const double *hatMatrix){
+void NormalizedResidual::calculateHatMatrix(const float *jacobianMatrix, const float *gainMatrix, const float *covarianceMatrix){
+    //hatMatrix = matriz jacobiana * matriz de ganho invertida * matriz jacobiana transposta * matriz de covariancia invertida
+
+
+}
+
+void NormalizedResidual::calculateSensitivityMatrix(){
 
     //Criando Matrix Identidade =============================================
     bool identityMatrix[size][size];
@@ -130,7 +146,7 @@ void NormalizedResidual::LargestNormalizedResidualTest(float *measurementArray, 
 
     setMeasurementArray(measurementArray);
     setEstimatedMeasurementArray(estimatedArray);
-    calculateSensitivityMatrix(hatMatrix);
+    calculateSensitivityMatrix();
     calculateResidualCovarianceMatrix(covarianceMatrix);
 
     float largestResidual;
