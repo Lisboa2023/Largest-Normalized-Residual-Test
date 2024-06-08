@@ -11,9 +11,9 @@ NormalizedResidual::NormalizedResidual(const int SIZE, const float THRESHOLD){
     estimatedMeasurement = new float[SIZE];
     residualArray = new float[SIZE];
     normalizedArray = new float[SIZE];
-    hatMatrix = new float[size*size];
-    sensitivityMatrix = new float[size*size];
-    residualCovarianceMatrix = new float[size*size];
+    hatMatrix = new float[SIZE*SIZE];
+    sensitivityMatrix = new float[SIZE*SIZE];
+    residualCovarianceMatrix = new float[SIZE*SIZE];
 }
 
 NormalizedResidual::~NormalizedResidual(){
