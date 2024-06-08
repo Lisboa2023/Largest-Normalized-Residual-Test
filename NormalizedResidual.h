@@ -17,6 +17,12 @@ class NormalizedResidual{
         void setResidualCovarianceMatrix(float *);
         void setHatMatrix(float *);
         //=======================================================================
+
+        //Funcoes GET============================================================
+        int getNumberOfMeasurements() const;
+        float getSensitivityMatrix() const;
+
+        //=======================================================================
         
         void calculateHatMatrix(const float *, const float *, const float *);
         void calculateSensitivityMatrix();

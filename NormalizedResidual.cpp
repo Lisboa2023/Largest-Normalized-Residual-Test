@@ -64,6 +64,17 @@ void NormalizedResidual::setHatMatrix(float *hMatrix){
 }
 //=============================================================================================
 
+
+//Funcoes GET============================================================
+int NormalizedResidual::getNumberOfMeasurements() const{
+    return size;
+}
+float NormalizedResidual::getSensitivityMatrix() const{
+    return sensitivityMatrix;
+}
+
+//=======================================================================
+
 void NormalizedResidual::calculateHatMatrix(const float *jacobianMatrix, const float *gainMatrix, const float *covarianceMatrix){
     //hatMatrix = matriz jacobiana * matriz de ganho invertida * matriz jacobiana transposta * matriz de covariancia invertida
 

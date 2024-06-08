@@ -5,10 +5,12 @@
 
 class HipothesisTest:public NormalizedResidual{
     public:
-        HipothesisTest();
+        HipothesisTest(float, float);
         ~HipothesisTest();
 
         //Funcoes SET ============================================================
+        void setNBeta(float);
+        void setNMaximus(float);
         void setInverseSensitivityMatrix(const float *);
         void setSuspectResidualMeasurements(const float *);
         void setSuspectErrorMeasurements(const float *);
@@ -16,8 +18,6 @@ class HipothesisTest:public NormalizedResidual{
         void setSensitivityMatrixSS(const float *);
         void setSensitivityMatrixST(const float *);
         void setEstimatedErrorMeasurements(const float *);
-        void setNMeasurements(const float *);
-        void setThresholdMeasurements(const float *);
 
         //=======================================================================
 
@@ -33,7 +33,7 @@ class HipothesisTest:public NormalizedResidual{
 
     private:
         float N_beta;
-        float N_maximo;
+        float N_maximus;
         float *inverse_sensitivity_matrix_ss;
         float *suspect_residual_measurements;
         float *suspect_error_measuremnets;
