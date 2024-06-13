@@ -73,6 +73,22 @@ float NormalizedResidual::getSensitivityMatrix() const{
     return sensitivityMatrix;
 }
 
+float getResidualCovarianceMatrix() const{
+    return residualCovarianceMatrix;
+}
+
+float getResidualArray() const{
+    return residualArray;
+}
+
+float getNormalizedArray() const{
+    return normalizedArray;
+}
+
+float getThreshold() const{
+    return threshold;
+}
+
 //=======================================================================
 
 void NormalizedResidual::calculateHatMatrix(const float *jacobianMatrix, const float *gainMatrix, const float *covarianceMatrix){

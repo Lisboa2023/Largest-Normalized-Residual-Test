@@ -21,6 +21,10 @@ class NormalizedResidual{
         //Funcoes GET============================================================
         int getNumberOfMeasurements() const;
         float getSensitivityMatrix() const;
+        float getResidualCovarianceMatrix() const;
+        float getResidualArray() const;
+        float getNormalizedArray() const;
+        float getThreshold() const;
 
         //=======================================================================
         
