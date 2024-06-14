@@ -9,22 +9,26 @@ class NormalizedResidual{
         //Funcoes SET ============================================================
         void setNumberOfMeasurements(const int);
         void setThreshold(const float);
+
+        void setHatMatrix(float *);
+        void setSensitivityMatrix(float *);
+        void setResidualCovarianceMatrix(float *);
+
         void setMeasurementArray(float *);
         void setEstimatedMeasurementArray(float *);
         void setResidualArray(float *);
         void setNormalizedArray(float *);
-        void setSensitivityMatrix(float *);
-        void setResidualCovarianceMatrix(float *);
-        void setHatMatrix(float *);
         //=======================================================================
 
         //Funcoes GET============================================================
         int getNumberOfMeasurements() const;
+        float getThreshold() const;
+
         float getSensitivityMatrix() const;
         float getResidualCovarianceMatrix() const;
+        
         float getResidualArray() const;
         float getNormalizedArray() const;
-        float getThreshold() const;
 
         //=======================================================================
         

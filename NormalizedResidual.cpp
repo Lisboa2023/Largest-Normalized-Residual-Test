@@ -35,6 +35,18 @@ void NormalizedResidual::setThreshold(const float THRESHOLD){
     threshold = THRESHOLD;
 }
 
+void NormalizedResidual::setHatMatrix(float *hMatrix){
+    hatMatrix = hMatrix;
+}
+
+void NormalizedResidual::setSensitivityMatrix(float *sMatrix){
+    sensitivityMatrix = sMatrix;
+}
+
+void NormalizedResidual::setResidualCovarianceMatrix(float *rcMatrix){
+    residualCovarianceMatrix = rcMatrix;
+}
+
 void NormalizedResidual::setMeasurementArray(float *measurementArray){
     measurement = measurementArray;
 }
@@ -51,17 +63,7 @@ void NormalizedResidual::setNormalizedArray(float *nArray){
     normalizedArray = nArray;
 }
 
-void NormalizedResidual::setSensitivityMatrix(float *sMatrix){
-    sensitivityMatrix = sMatrix;
-}
 
-void NormalizedResidual::setResidualCovarianceMatrix(float *rcMatrix){
-    residualCovarianceMatrix = rcMatrix;
-}
-
-void NormalizedResidual::setHatMatrix(float *hMatrix){
-    hatMatrix = hMatrix;
-}
 //=============================================================================================
 
 
@@ -69,24 +71,25 @@ void NormalizedResidual::setHatMatrix(float *hMatrix){
 int NormalizedResidual::getNumberOfMeasurements() const{
     return size;
 }
-float NormalizedResidual::getSensitivityMatrix() const{
-    return sensitivityMatrix;
-}
 
-float getResidualCovarianceMatrix() const{
-    return residualCovarianceMatrix;
-}
-
-float getResidualArray() const{
-    return residualArray;
-}
-
-float getNormalizedArray() const{
-    return normalizedArray;
-}
-
-float getThreshold() const{
+float NormalizedResidual::getThreshold() const{
     return threshold;
+}
+
+float NormalizedResidual::getSensitivityMatrix() const{
+    return *sensitivityMatrix;
+}
+
+float NormalizedResidual::getResidualCovarianceMatrix() const{
+    return *residualCovarianceMatrix;
+}
+
+float NormalizedResidual::getResidualArray() const{
+    return *residualArray;
+}
+
+float NormalizedResidual::getNormalizedArray() const{
+    return *normalizedArray;
 }
 
 //=======================================================================

@@ -13,17 +13,17 @@ class HipothesisTest:public NormalizedResidual{
         void setNMaximus(float);
         void setNumberSelectedMeasurements(int);
 
-        void setSuspectCovarianceMatrix(const float *);
+        void setSuspectCovarianceMatrix(float *);
 
-        void setSuspectErrorMeasurements(const float *);
-        void setTrueErrorMeasurements(const float *);
-        void setSuspectResidualMeasurements(const float *);
+        void setSuspectErrorMeasurements(float *);
+        void setTrueErrorMeasurements(float *);
+        void setSuspectResidualMeasurements(float *);
 
-        void setSensitivityMatrixSS(const float *);
-        void setInverseSensitivityMatrixSS(const float *);
-        void setSensitivityMatrixST(const float *);
+        void setSensitivityMatrixSS(float *);
+        void setInverseSensitivityMatrixSS(float *);
+        void setSensitivityMatrixST(float *);
 
-        void setEstimatedErrorMeasurements(const float *);
+        void setEstimatedErrorMeasurements(float *);
 
         //=======================================================================       
 
