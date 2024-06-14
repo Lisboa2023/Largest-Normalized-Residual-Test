@@ -5,7 +5,7 @@
 
 class HipothesisTest:public NormalizedResidual{
     public:
-        HipothesisTest(const float, const float, const int);
+        HipothesisTest(const float, const float, const int, const float);
         ~HipothesisTest();
 
         //Funcoes SET ============================================================

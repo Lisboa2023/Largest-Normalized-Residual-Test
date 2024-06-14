@@ -4,10 +4,10 @@
 #include "NormalizedResidual.h"
 #include "HipothesisTest.h"
 
-HipothesisTest::HipothesisTest(const float nBeta, const float nMaximus, const int SIZE){
+HipothesisTest::HipothesisTest(const float nBeta, const float nMaximus, const int SIZE, const float THRESHOLD):NormalizedResidual(SIZE, THRESHOLD){
     setNBeta(nBeta);
     setNMaximus(nMaximus);
-    setNumberOfMeasurements(SIZE);
+    setNumberSelectedMeasurements(0);
 }
 
 HipothesisTest::~HipothesisTest(){
@@ -112,12 +112,15 @@ void HipothesisTest::SelectSuspectResidualCovarianceMatrix(){
 void HipothesisTest::SelectSuspectErrorMeasurements(){
 
     suspect_error_measuremnets = new float[number_selected_measurements];
+    // achar vetor suspeito de erros 
 
 }
 
 void HipothesisTest::SelectTrueErrorMeasurements(){
 
     true_error_measurements = new float[number_selected_measurements];
+    // vetor erros verdadeiros
+
 
 }
 
@@ -140,21 +143,22 @@ void HipothesisTest::SelectSensitivityMatrixSS(){
     
     for(int i = 0; i < number_selected_measurements; i++){
         j = suspect_selected_measurements[i];
-        suspect_residual_covariance_matrix[i] = temp[j*number_selected_measurements + j];
+        sensitivity_matrix_SS[i] = temp[j*number_selected_measurements + j];
     }
-
-
 }
 
 void HipothesisTest::CalculateInverseSensitivityMatrixSS(const float *){
 
     inverse_sensitivity_matrix_ss = new float[number_selected_measurements];
+    // chama função de inversao de matriz
+
 
 }
 
 void HipothesisTest::SelectSensitivityMatrixST(){
 
     sensitivity_matrix_ST = new float[number_selected_measurements];
+    //achar matriz de sensibilidade ST
 
 }
 
@@ -203,7 +207,7 @@ void HipothesisTest::SelectMeasurements(){
     for(int i = 0; i < number_selected_measurements; i++){
         if(estimated_error_measurements[i] > threshold_measurements[i]){
             selected_measurements[j] = ;
-            j++
+            j++;
         }
     }
 

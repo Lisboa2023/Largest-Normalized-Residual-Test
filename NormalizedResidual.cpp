@@ -76,23 +76,61 @@ float NormalizedResidual::getThreshold() const{
     return threshold;
 }
 
-float NormalizedResidual::getSensitivityMatrix() const{
-    return *sensitivityMatrix;
+float *NormalizedResidual::getSensitivityMatrix() const{
+    return sensitivityMatrix;
 }
 
-float NormalizedResidual::getResidualCovarianceMatrix() const{
-    return *residualCovarianceMatrix;
+float *NormalizedResidual::getResidualCovarianceMatrix() const{
+    return residualCovarianceMatrix;
 }
 
-float NormalizedResidual::getResidualArray() const{
-    return *residualArray;
+float *NormalizedResidual::getResidualArray() const{
+    return residualArray;
 }
 
-float NormalizedResidual::getNormalizedArray() const{
-    return *normalizedArray;
+float *NormalizedResidual::getNormalizedArray() const{
+    return normalizedArray;
 }
 
 //=======================================================================
+
+void NormalizedResidual::calculateInverseMatrix(const float *matrix){
+
+    //permutacao de linhas
+
+    float temp;
+    for(int i = 0; i < size; i++)
+    { 
+        for(int j = 0; j < size; j++)
+        {
+            if(i==j && matrix[i][j] == 0)
+            {   
+                for(int p = i+1; p < size; p++)
+                {   
+                    if(matrix[p][j] != 0)
+                    {
+                        for(int n = 0; n < size; n++)
+                        {
+                            temp = matrix[i][n];
+                            matrix[i][n] = matrix[p][n];
+                            matrix[p][n] = temp;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    //algoritmo de eliminacao de gauss-jordan
+
+
+}
+
+void NormalizedResidual::calculateTransposedMatrix(){
+
+
+}
 
 void NormalizedResidual::calculateHatMatrix(const float *jacobianMatrix, const float *gainMatrix, const float *covarianceMatrix){
     //hatMatrix = matriz jacobiana * matriz de ganho invertida * matriz jacobiana transposta * matriz de covariancia invertida

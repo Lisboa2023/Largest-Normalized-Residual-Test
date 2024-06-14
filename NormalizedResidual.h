@@ -24,14 +24,16 @@ class NormalizedResidual{
         int getNumberOfMeasurements() const;
         float getThreshold() const;
 
-        float getSensitivityMatrix() const;
-        float getResidualCovarianceMatrix() const;
+        float *getSensitivityMatrix() const;
+        float *getResidualCovarianceMatrix() const;
         
-        float getResidualArray() const;
-        float getNormalizedArray() const;
+        float *getResidualArray() const;
+        float *getNormalizedArray() const;
 
         //=======================================================================
         
+        void calculateInverseMatrix(const float *);
+        void calculateTransposedMatrix();
         void calculateHatMatrix(const float *, const float *, const float *);
         void calculateSensitivityMatrix();
         void calculateResidualCovarianceMatrix(const double *);
