@@ -8,7 +8,6 @@ HipothesisTest::HipothesisTest(const float nBeta, const float nMaximus, const in
     setNBeta(nBeta);
     setNMaximus(nMaximus);
     setNumberOfMeasurements(SIZE);
-    setNumberSelectedMeasurements(0);
 }
 
 HipothesisTest::~HipothesisTest(){
