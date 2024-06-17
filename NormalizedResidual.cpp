@@ -7,6 +7,8 @@ NormalizedResidual::NormalizedResidual(const int SIZE, const float THRESHOLD){
     setNumberOfMeasurements(SIZE);
     setThreshold(THRESHOLD);
 
+    inverseMatrix = new float[SIZE*SIZE];
+    transposedMatrix = new float[SIZE*SIZE];
     measurement = new float[SIZE];
     estimatedMeasurement = new float[SIZE];
     residualArray = new float[SIZE];
@@ -17,6 +19,8 @@ NormalizedResidual::NormalizedResidual(const int SIZE, const float THRESHOLD){
 }
 
 NormalizedResidual::~NormalizedResidual(){
+    delete [] inverseMatrix;
+    delete [] transposedMatrix;
     delete [] measurement;
     delete [] estimatedMeasurement;
     delete [] residualArray;
@@ -76,6 +80,10 @@ float NormalizedResidual::getThreshold() const{
     return threshold;
 }
 
+float *NormalizedResidual::getInverseMatrix() const{
+    return inverseMatrix;
+}
+
 float *NormalizedResidual::getSensitivityMatrix() const{
     return sensitivityMatrix;
 }
@@ -94,26 +102,27 @@ float *NormalizedResidual::getNormalizedArray() const{
 
 //=======================================================================
 
-void NormalizedResidual::calculateInverseMatrix(const float *matrix){
+void NormalizedResidual::calculateInverseMatrix(float *matrix){
+
+    inverseMatrix = matrix;
 
     //permutacao de linhas
-
     float temp;
     for(int i = 0; i < size; i++)
     { 
         for(int j = 0; j < size; j++)
         {
-            if(i==j && matrix[i][j] == 0)
+            if(i==j && inverseMatrix[i*size + j] == 0)
             {   
                 for(int p = i+1; p < size; p++)
                 {   
-                    if(matrix[p][j] != 0)
+                    if(inverseMatrix[p*size + j] != 0)
                     {
                         for(int n = 0; n < size; n++)
                         {
-                            temp = matrix[i][n];
-                            matrix[i][n] = matrix[p][n];
-                            matrix[p][n] = temp;
+                            temp = inverseMatrix[i*size + n];
+                            inverseMatrix[i*size + n] = inverseMatrix[p*size + n];
+                            inverseMatrix[p*size + n] = temp;
                         }
                         break;
                     }
@@ -127,15 +136,49 @@ void NormalizedResidual::calculateInverseMatrix(const float *matrix){
 
 }
 
-void NormalizedResidual::calculateTransposedMatrix(){
+void NormalizedResidual::calculateTransposedMatrix(const float *matrix){
 
-
+    for(int i = 0; i < size; i++){
+        for(int j = 0; j < size; j++){
+            transposedMatrix[i*size + j] = matrix[j*size + i];
+        }
+    }
 }
 
-void NormalizedResidual::calculateHatMatrix(const float *jacobianMatrix, const float *gainMatrix, const float *covarianceMatrix){
+void NormalizedResidual::calculateHatMatrix(float *jacobianMatrix, float *gainMatrix, float *covarianceMatrix){
     //hatMatrix = matriz jacobiana * matriz de ganho invertida * matriz jacobiana transposta * matriz de covariancia invertida
+    
+    //matriz jacobiana * matriz de ganho invertida
+    calculateInverseMatrix(gainMatrix);
+    for(int i = 0; i < size; i++){
+        for(int j = 0; j < size; j++){
+            for(int k = 0; k < 3; k++){
+                hatMatrix[i*size + j] = 0;
+                hatMatrix[i*size + j] += jacobianMatrix[i*size + k]*inverseMatrix[k*size + j];
+            }
+        }
+    }
 
+    // * matriz jacobiana transposta
+    calculateTransposedMatrix(jacobianMatrix);
+    for(int i = 0; i < size; i++){
+        for(int j = 0; j < size; j++){
+            for(int k = 0; k < size; k++){
+                hatMatrix[i*size + j] += hatMatrix[i*size + k]*transposedMatrix[k*size + j];
+            }
+        }
+    }
 
+    // * matriz de covariancia invertida
+    calculateInverseMatrix(covarianceMatrix);
+    for(int i = 0; i < size; i++){
+        for(int j = 0; j < size; j++){
+            for(int k = 0; k < size; k++){
+                hatMatrix[i*size + j] += covarianceMatrix[i*size + k]*inverseMatrix[k*size + j];
+            }
+        }
+    }
+    
 }
 
 void NormalizedResidual::calculateSensitivityMatrix(){
@@ -161,11 +204,12 @@ void NormalizedResidual::calculateSensitivityMatrix(){
     } 
 }
 
-void NormalizedResidual::calculateResidualCovarianceMatrix(const double *covarianceMatrix){
+void NormalizedResidual::calculateResidualCovarianceMatrix(const float *covarianceMatrix){
 
-    for(int i = 0; i < 3; i++){
-        for(int j = 0; j < 3; j++){
-            for(int k = 0; k < 3; k++){
+    for(int i = 0; i < size; i++){
+        for(int j = 0; j < size; j++){
+            for(int k = 0; k < size; k++){
+                residualCovarianceMatrix[i*size + j] = 0;
                 residualCovarianceMatrix[i*size + j] += sensitivityMatrix[i*size + k]*covarianceMatrix[k*size + j];
             }
         }
@@ -204,23 +248,24 @@ void NormalizedResidual::deleteError(const int threshold, const float lg, const 
 }
 
 void NormalizedResidual::print(const float *ptr){
-    for(int i = 0; i<size; i++){
+    for(int i = 0; i < size; i++){
         std::cout << std::setw(10) << std::setprecision(3) << ptr[i] ;
     }
     std::cout << std::endl;
 }
 
-void NormalizedResidual::LargestNormalizedResidualTest(float *measurementArray, float *estimatedArray, const double *hatMatrix, const double *covarianceMatrix){
+void NormalizedResidual::LargestNormalizedResidualTest(float *measurementArray, float *estimatedArray, float *jacobianMatrix, float *gainMatrix, float *covarianceMatrix){
 
     setMeasurementArray(measurementArray);
     setEstimatedMeasurementArray(estimatedArray);
+    calculateHatMatrix(jacobianMatrix, gainMatrix, covarianceMatrix);
     calculateSensitivityMatrix();
     calculateResidualCovarianceMatrix(covarianceMatrix);
 
     float largestResidual;
     int position;
 
-    for(int i=0; i<size; i++){
+    for(int i=0; i < size; i++){
         calculateResidualArray();
         calculateNormalizedResidualArray();
         if(i==0){

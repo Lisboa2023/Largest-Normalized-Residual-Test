@@ -35,7 +35,7 @@ class HipothesisTest:public NormalizedResidual{
         void CalculateSuspectResidualMeasurements();
         
         void SelectSensitivityMatrixSS();
-        void CalculateInverseSensitivityMatrixSS(const float *);
+        void CalculateInverseSensitivityMatrixSS();
         void SelectSensitivityMatrixST();
         
         void CalculateEstimatedErrorMeasurements();
@@ -48,10 +48,11 @@ class HipothesisTest:public NormalizedResidual{
         int number_selected_measurements;
         float N_beta;
         float N_maximus;
+        float *true_selected_measurements;
         float *suspect_selected_measurements;
         float *suspect_residual_covariance_matrix;
         float *suspect_residual_measurements;
-        float *suspect_error_measuremnets;
+        float *suspect_error_measurements;
         float *true_error_measurements;
         float *sensitivity_matrix_SS;
         float *inverse_sensitivity_matrix_ss;

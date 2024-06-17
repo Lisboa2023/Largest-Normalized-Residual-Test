@@ -15,7 +15,7 @@ HipothesisTest::~HipothesisTest(){
     delete [] suspect_selected_measurements;
     delete [] suspect_residual_covariance_matrix;
     delete [] suspect_residual_measurements;
-    delete [] suspect_error_measuremnets;
+    delete [] suspect_error_measurements;
     delete [] true_error_measurements;
     delete [] sensitivity_matrix_SS;
     delete [] inverse_sensitivity_matrix_ss;
@@ -40,7 +40,6 @@ void HipothesisTest::setNumberSelectedMeasurements(int numberSelectedMeasurement
     number_selected_measurements = numberSelectedMeasurements;
 }
 
-
 void HipothesisTest::setInverseSensitivityMatrixSS(float *inverseSensitivityMatrixSS){
     inverse_sensitivity_matrix_ss = inverseSensitivityMatrixSS;    
 }
@@ -54,7 +53,7 @@ void HipothesisTest::setSuspectResidualMeasurements(float *suspectResidualMeasur
 }
 
 void HipothesisTest::setSuspectErrorMeasurements(float *suspectErrorMeasurements){
-    suspect_error_measuremnets = suspectErrorMeasurements;
+    suspect_error_measurements = suspectErrorMeasurements;
 }
 
 void HipothesisTest::setTrueErrorMeasurements(float *trueErrorMeasurements){
@@ -89,11 +88,17 @@ void HipothesisTest::SelectSuspectMeasurements(){
     suspect_selected_measurements = new float[number_selected_measurements];
     
     int count = 0;
+    int count1 = 0;
     for(int i = 0; i < num; i++){
         if(temp[i] > normalizedThreshold){   
             suspect_selected_measurements[count] = i;
             count++;
         }
+
+        else{
+            // true_selected_measurements[count1] = i;
+            // count1++; 
+        } 
     }
 }
 
@@ -110,18 +115,26 @@ void HipothesisTest::SelectSuspectResidualCovarianceMatrix(){
 }
 
 void HipothesisTest::SelectSuspectErrorMeasurements(){
-
-    suspect_error_measuremnets = new float[number_selected_measurements];
-    // achar vetor suspeito de erros 
-
+    float *temp = getResidualArray();
+    int j;
+    suspect_error_measurements = new float[number_selected_measurements];
+    
+    for(int i = 0; i < number_selected_measurements; i++){
+        j = suspect_selected_measurements[i];
+        suspect_error_measurements[i] = temp[j];
+    }
 }
 
 void HipothesisTest::SelectTrueErrorMeasurements(){
+    float *temp = getResidualArray();
+    int j;
 
     true_error_measurements = new float[number_selected_measurements];
-    // vetor erros verdadeiros
-
-
+    
+    for(int i = 0; i < number_selected_measurements; i++){
+        j = true_selected_measurements[i];
+        true_error_measurements[i] = temp[j];
+    }
 }
 
 void HipothesisTest::CalculateSuspectResidualMeasurements(){
@@ -129,7 +142,7 @@ void HipothesisTest::CalculateSuspectResidualMeasurements(){
     suspect_residual_measurements = new float[number_selected_measurements];
 
     for(int i = 0; i < number_selected_measurements; i++){
-        suspect_residual_measurements[i] = sensitivity_matrix_SS[i]*suspect_error_measuremnets[i];
+        suspect_residual_measurements[i] = sensitivity_matrix_SS[i]*suspect_error_measurements[i];
         suspect_residual_measurements[i] += sensitivity_matrix_ST[i]*true_error_measurements[i];
     }
 }
@@ -147,11 +160,12 @@ void HipothesisTest::SelectSensitivityMatrixSS(){
     }
 }
 
-void HipothesisTest::CalculateInverseSensitivityMatrixSS(const float *){
+void HipothesisTest::CalculateInverseSensitivityMatrixSS(){
 
     inverse_sensitivity_matrix_ss = new float[number_selected_measurements];
     // chama função de inversao de matriz
-
+    calculateInverseMatrix(sensitivity_matrix_SS);
+    inverse_sensitivity_matrix_ss = getInverseMatrix();
 
 }
 
@@ -206,7 +220,7 @@ void HipothesisTest::SelectMeasurements(){
     int j = 0; 
     for(int i = 0; i < number_selected_measurements; i++){
         if(estimated_error_measurements[i] > threshold_measurements[i]){
-            selected_measurements[j] = ;
+            selected_measurements[j] = i;
             j++;
         }
     }
