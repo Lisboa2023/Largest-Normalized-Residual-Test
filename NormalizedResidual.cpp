@@ -132,7 +132,51 @@ void NormalizedResidual::calculateInverseMatrix(float *matrix){
     }
 
     //algoritmo de eliminacao de gauss-jordan
+    float identityMatrix[size][size];
 
+    
+    //Criando matriz identidade
+    for(int i = 0; i < size; i++){
+        for(int j = 0;j < size; j++){
+            if(i==j){
+                identityMatrix[i][j]=1;
+            }
+            else{
+                identityMatrix[i][j]=0;
+            }
+        }
+    }
+    
+    for (int i = 0; i < size; i++)
+	{
+		// Dividindo a linha atual pelo elemento diagonal correspondente
+		float pivo = inverseMatrix[i*size + i];
+		for ( int j = 0; j < size; j++)
+		{
+			inverseMatrix[i*size + j] /= pivo;
+			identityMatrix[i][j] /= pivo; //As mesmas operações são feitas na matriz identidade para se obter a inversa
+		}
+
+		// Reduzindo as outras linhas
+		for (int j = 0; j < size; j++)
+		{
+			if (j != i)
+			{
+				float a = inverseMatrix[j*size + i];
+				for (int k = 0; k < size; k++)
+				{
+					inverseMatrix[j*size + k] -= a * inverseMatrix[i*size + k]; //Colocando 0 abaixo e acima dos pivos
+					identityMatrix[j][k] -= a * identityMatrix[i][k];//Repetindo operações na matriz identidade
+				}
+			}
+		}
+	}
+
+    for(int i = 0; i < size; i++){
+        for(int j = 0; j < size; j++){
+            inverseMatrix[i*size + j] = identityMatrix[i][j];
+        }
+    }
 
 }
 

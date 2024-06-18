@@ -37,35 +37,35 @@ int main(){
     float *cmPtr = covarianceMatrix[0];
 
     NormalizedResidual LNRTest(size,threshold);
-    // LNRTest.LargestNormalizedResidualTest(measurementArray,estimatedArray,jPtr,gPtr, cmPtr);
-    // LNRTest.setMeasurementArray(measurementArray);
-    // LNRTest.setEstimatedMeasurementArray(estimatedArray);
-    // LNRTest.setResidualCovarianceMatrix(cmPtr);
+    // LNRTest.LargestNormalizedResidualTest(measurementArray,estimatedArray,jPtr,gPtr,cmPtr);
+    LNRTest.setMeasurementArray(measurementArray);
+    LNRTest.setEstimatedMeasurementArray(estimatedArray);
+    LNRTest.setResidualCovarianceMatrix(cmPtr);
 
-    // float largestResidual;
-    // int position;
+    float largestResidual;
+    int position;
 
-    // for(int i=0; i < size; i++){
-    //     LNRTest.calculateResidualArray();
-    //     LNRTest.calculateNormalizedResidualArray();
-    //     if(i==0){
-    //         std::cout << "Conjunto de medicoes residuais: " << std::endl; 
-    //         LNRTest.print(LNRTest.getResidualArray());
-    //         std::cout << std::endl << "Conjunto de medicoes residuais normalizadas: " << std::endl; 
-    //         LNRTest.print(LNRTest.getNormalizedArray());
-    //         std::cout << std::endl << "Limite: " << std::setprecision(3) <<threshold << std::endl;
-    //     }
-    //     LNRTest.findLargestResidual(largestResidual, position);
-    //     if (largestResidual > threshold){ 
-    //         LNRTest.deleteError(threshold, largestResidual, position);
-    //         LNRTest.print(LNRTest.getNormalizedArray());
-    //     }
-    //     else{
-    //         std::cout << std::endl << "Conjunto de medicoes livre de erro!" << std::endl <<
-    //         std::endl;
-    //         break;
-    //     }
-    // }
+    for(int i=0; i < size; i++){
+        LNRTest.calculateResidualArray();
+        LNRTest.calculateNormalizedResidualArray();
+        if(i==0){
+            std::cout << "Conjunto de medicoes residuais: " << std::endl; 
+            LNRTest.print(LNRTest.getResidualArray());
+            std::cout << std::endl << "Conjunto de medicoes residuais normalizadas: " << std::endl; 
+            LNRTest.print(LNRTest.getNormalizedArray());
+            std::cout << std::endl << "Limite: " << std::setprecision(3) <<threshold << std::endl;
+        }
+        LNRTest.findLargestResidual(largestResidual, position);
+        if (largestResidual > threshold){ 
+            LNRTest.deleteError(threshold, largestResidual, position);
+            LNRTest.print(LNRTest.getNormalizedArray());
+        }
+        else{
+            std::cout << std::endl << "Conjunto de medicoes livre de erro!" << std::endl <<
+            std::endl;
+            break;
+        }
+    }
 
     return 0;
 }
