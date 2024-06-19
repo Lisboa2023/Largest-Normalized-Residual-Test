@@ -33,12 +33,13 @@ class NormalizedResidual{
 
         //=======================================================================
         
-        void calculateInverseMatrix(float *);
-        void calculateTransposedMatrix(const float *);
+        void calculateInverseMatrix(float *, const int);
+        void calculateTransposedMatrix(const float *, const int, const int);
 
         void calculateHatMatrix(float *, float *, float *);
         void calculateSensitivityMatrix();
         void calculateResidualCovarianceMatrix(const float *);
+
         void calculateResidualArray();
         void calculateNormalizedResidualArray();
         void findLargestResidual(float &, int &);
@@ -50,15 +51,19 @@ class NormalizedResidual{
     private:
         int size;
         float threshold;
+
         float *inverseMatrix;
         float *transposedMatrix;
+
+        float *hatMatrix;
+        float *sensitivityMatrix;
+        float *residualCovarianceMatrix;
+
         float *measurement;
         float *estimatedMeasurement;
         float *residualArray;
         float *normalizedArray;
-        float *hatMatrix;
-        float *sensitivityMatrix;
-        float *residualCovarianceMatrix;
+
 };
 
 #endif

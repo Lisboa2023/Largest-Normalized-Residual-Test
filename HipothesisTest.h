@@ -12,43 +12,33 @@ class HipothesisTest:public NormalizedResidual{
         void setNBeta(float);
         void setNMaximus(float);
         void setNumberSelectedMeasurements(int);
-
-        void setSuspectCovarianceMatrix(float *);
-
-        void setSuspectErrorMeasurements(float *);
-        void setTrueMeasurements(float *);
-        void setSuspectResidualMeasurements(float *);
-
-        void setSensitivityMatrixSS(float *);
-        void setInverseSensitivityMatrixSS(float *);
-        void setSensitivityMatrixST(float *);
-
-        void setEstimatedErrorMeasurements(float *);
+        void setNumberNonSelectedMeasurements(int);
 
         //=======================================================================       
 
         void SelectSuspectMeasurements();
-        void SelectSuspectResidualCovarianceMatrix();
 
+        void SelectSuspectResidualCovarianceMatrix();
         void SelectSuspectErrorMeasurements();
         void SelectTrueMeasurements();
-        void CalculateSuspectResidualMeasurements();
-        
         void SelectSensitivityMatrixSS();
-        void CalculateInverseSensitivityMatrixSS();
         void SelectSensitivityMatrixST();
         
+        void CalculateInverseSensitivityMatrixSS();
+        void CalculateSuspectResidualMeasurements();
         void CalculateEstimatedErrorMeasurements();
         void CalculateNMeasurements();
         void CalculateThersholdMeasurements();
 
         void SelectMeasurements();
+        void printHTI();
 
     private:
         int number_selected_measurements;
+        int number_non_selected_measurements;
         float N_beta;
         float N_maximus;
-        float *true_selected_measurements;
+        float *non_selected_measurements;
         float *suspect_selected_measurements;
         float *suspect_residual_covariance_matrix;
         float *suspect_residual_measurements;

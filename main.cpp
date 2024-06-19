@@ -3,14 +3,15 @@
 #include<iomanip>
 
 #include"NormalizedResidual.h"
+#include"HipothesisTest.h"
 
 int main(){
     // const int size = 5;
     // const float thershold = 3.0;
 
-    // const float measurementArray[] = {1.0285, 1.0121, 0.9893, 0.4796, 0.3891};
-    // const float estimatedMeasurement[] = {0.9999, 0.9886, 0.9833, 0.4856, 0.3821};
-    // const double covarianceMatrix[][size] = {{0.00004637, 0,0,0,0},
+    // float measurementArray[] = {1.0285, 1.0121, 0.9893, 0.4796, 0.3891};
+    // float estimatedMeasurement[] = {0.9999, 0.9886, 0.9833, 0.4856, 0.3821};
+    // float covarianceMatrix[][size] = {{0.00004637, 0,0,0,0},
     //                                    {0,0.00003285,0,0,0},
     //                                    {0,0, 0.000006805,0,0},
     //                                    {0,0,0, 0.000006805,0},
@@ -18,6 +19,7 @@ int main(){
 
     const int size = 4;
     const float threshold = 3.0;
+    int x =0, y = 0;
 
     float measurementArray[] = {3.90, -4.05, -0.48, 2.04};
     float estimatedArray[] = {3.992, -3.61, -0.374, 2.09};
@@ -32,40 +34,18 @@ int main(){
                                       {0,0, 0.001,0},
                                       {0,0,0, 0.002}};
 
+    float sensitivityMatrix[][3] = {{0.4916,-0.2236,0.3577},
+                                    {-0.2236,0.1017,-0.1627},
+                                    {0.5589,-0.2542,0.4068}}; 
+
     float *jPtr = jacobianMatrix[0];
     float *gPtr = gainMatrix[0];
     float *cmPtr = covarianceMatrix[0];
 
-    NormalizedResidual LNRTest(size,threshold);
-    // LNRTest.LargestNormalizedResidualTest(measurementArray,estimatedArray,jPtr,gPtr,cmPtr);
-    LNRTest.setMeasurementArray(measurementArray);
-    LNRTest.setEstimatedMeasurementArray(estimatedArray);
-    LNRTest.setResidualCovarianceMatrix(cmPtr);
+    HipothesisTest HTITest(x,y,size,threshold);
+    HTITest.setSensitivityMatrix(jPtr);
+    HTITest.calculateTransposedMatrix(HTITest.getSensitivityMatrix(),4,2);
 
-    float largestResidual;
-    int position;
-
-    for(int i=0; i < size; i++){
-        LNRTest.calculateResidualArray();
-        LNRTest.calculateNormalizedResidualArray();
-        if(i==0){
-            std::cout << "Conjunto de medicoes residuais: " << std::endl; 
-            LNRTest.print(LNRTest.getResidualArray());
-            std::cout << std::endl << "Conjunto de medicoes residuais normalizadas: " << std::endl; 
-            LNRTest.print(LNRTest.getNormalizedArray());
-            std::cout << std::endl << "Limite: " << std::setprecision(3) <<threshold << std::endl;
-        }
-        LNRTest.findLargestResidual(largestResidual, position);
-        if (largestResidual > threshold){ 
-            LNRTest.deleteError(threshold, largestResidual, position);
-            LNRTest.print(LNRTest.getNormalizedArray());
-        }
-        else{
-            std::cout << std::endl << "Conjunto de medicoes livre de erro!" << std::endl <<
-            std::endl;
-            break;
-        }
-    }
 
     return 0;
 }

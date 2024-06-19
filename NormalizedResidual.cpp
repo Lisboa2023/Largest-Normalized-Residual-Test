@@ -7,15 +7,12 @@ NormalizedResidual::NormalizedResidual(const int SIZE, const float THRESHOLD){
     setNumberOfMeasurements(SIZE);
     setThreshold(THRESHOLD);
 
-    inverseMatrix = new float[SIZE*SIZE];
-    transposedMatrix = new float[SIZE*SIZE];
     measurement = new float[SIZE];
     estimatedMeasurement = new float[SIZE];
-    residualArray = new float[SIZE];
-    normalizedArray = new float[SIZE];
-    hatMatrix = new float[SIZE*SIZE];
     sensitivityMatrix = new float[SIZE*SIZE];
     residualCovarianceMatrix = new float[SIZE*SIZE];
+    residualArray = new float[SIZE];
+    normalizedArray = new float[SIZE];
 }
 
 NormalizedResidual::~NormalizedResidual(){
@@ -102,27 +99,27 @@ float *NormalizedResidual::getNormalizedArray() const{
 
 //=======================================================================
 
-void NormalizedResidual::calculateInverseMatrix(float *matrix){
+void NormalizedResidual::calculateInverseMatrix(float *matrix, const int length){
 
     inverseMatrix = matrix;
 
     //permutacao de linhas
     float temp;
-    for(int i = 0; i < size; i++)
+    for(int i = 0; i < length; i++)
     { 
-        for(int j = 0; j < size; j++)
+        for(int j = 0; j < length; j++)
         {
-            if(i==j && inverseMatrix[i*size + j] == 0)
+            if(i==j && inverseMatrix[i*length + j] == 0)
             {   
-                for(int p = i+1; p < size; p++)
+                for(int p = i+1; p < length; p++)
                 {   
-                    if(inverseMatrix[p*size + j] != 0)
+                    if(inverseMatrix[p*length + j] != 0)
                     {
-                        for(int n = 0; n < size; n++)
+                        for(int n = 0; n < length; n++)
                         {
-                            temp = inverseMatrix[i*size + n];
-                            inverseMatrix[i*size + n] = inverseMatrix[p*size + n];
-                            inverseMatrix[p*size + n] = temp;
+                            temp = inverseMatrix[i*length + n];
+                            inverseMatrix[i*length + n] = inverseMatrix[p*length + n];
+                            inverseMatrix[p*length + n] = temp;
                         }
                         break;
                     }
@@ -132,71 +129,75 @@ void NormalizedResidual::calculateInverseMatrix(float *matrix){
     }
 
     //algoritmo de eliminacao de gauss-jordan
-    float identityMatrix[size][size];
+    float identityMatrix[length][length];
 
     
     //Criando matriz identidade
-    for(int i = 0; i < size; i++){
-        for(int j = 0;j < size; j++){
+    for(int i = 0; i < length; i++){
+        for(int j = 0;j < length; j++){
             if(i==j){
-                identityMatrix[i][j]=1;
+                identityMatrix[i][j] = 1;
             }
             else{
-                identityMatrix[i][j]=0;
+                identityMatrix[i][j] = 0;
             }
         }
     }
     
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < length; i++)
 	{
 		// Dividindo a linha atual pelo elemento diagonal correspondente
-		float pivo = inverseMatrix[i*size + i];
-		for ( int j = 0; j < size; j++)
+		float pivot = inverseMatrix[i*length + i];
+		for ( int j = 0; j < length; j++)
 		{
-			inverseMatrix[i*size + j] /= pivo;
-			identityMatrix[i][j] /= pivo; //As mesmas operações são feitas na matriz identidade para se obter a inversa
+			inverseMatrix[i*length + j] /= pivot;
+			identityMatrix[i][j] /= pivot; //As mesmas operações são feitas na matriz identidade para se obter a inversa
 		}
 
 		// Reduzindo as outras linhas
-		for (int j = 0; j < size; j++)
+		for (int j = 0; j < length; j++)
 		{
 			if (j != i)
 			{
-				float a = inverseMatrix[j*size + i];
-				for (int k = 0; k < size; k++)
+				float a = inverseMatrix[j*length + i];
+				for (int k = 0; k < length; k++)
 				{
-					inverseMatrix[j*size + k] -= a * inverseMatrix[i*size + k]; //Colocando 0 abaixo e acima dos pivos
+					inverseMatrix[j*length + k] -= a * inverseMatrix[i*length + k]; //Colocando 0 abaixo e acima dos pivos
 					identityMatrix[j][k] -= a * identityMatrix[i][k];//Repetindo operações na matriz identidade
 				}
 			}
 		}
 	}
 
-    for(int i = 0; i < size; i++){
-        for(int j = 0; j < size; j++){
-            inverseMatrix[i*size + j] = identityMatrix[i][j];
+    for(int i = 0; i < length; i++){
+        for(int j = 0; j < length; j++){
+            inverseMatrix[i*length + j] = identityMatrix[i][j];
         }
     }
 
 }
 
-void NormalizedResidual::calculateTransposedMatrix(const float *matrix){
+void NormalizedResidual::calculateTransposedMatrix(const float *matrix, const int ROWS, const int COLUMNS){
+    
+    int rows = ROWS;
+    int columns = COLUMNS;
 
-    for(int i = 0; i < size; i++){
-        for(int j = 0; j < size; j++){
-            transposedMatrix[i*size + j] = matrix[j*size + i];
+    for(int i = 0; i < rows; i++){
+        for(int j = 0; j < columns; j++){
+            transposedMatrix[i*rows + j] = matrix[j*rows + i];
+            std::cout << std::setw(10) << transposedMatrix[i*rows+j];
         }
     }
 }
 
 void NormalizedResidual::calculateHatMatrix(float *jacobianMatrix, float *gainMatrix, float *covarianceMatrix){
     //hatMatrix = matriz jacobiana * matriz de ganho invertida * matriz jacobiana transposta * matriz de covariancia invertida
-    
+    hatMatrix = new float[size];
     //matriz jacobiana * matriz de ganho invertida
-    calculateInverseMatrix(gainMatrix);
+    calculateInverseMatrix(gainMatrix, size);
     for(int i = 0; i < size; i++){
         for(int j = 0; j < size; j++){
-            for(int k = 0; k < 3; k++){
+            for(int k = 0; k < size; k++){
                 hatMatrix[i*size + j] = 0;
                 hatMatrix[i*size + j] += jacobianMatrix[i*size + k]*inverseMatrix[k*size + j];
             }
@@ -204,7 +205,7 @@ void NormalizedResidual::calculateHatMatrix(float *jacobianMatrix, float *gainMa
     }
 
     // * matriz jacobiana transposta
-    calculateTransposedMatrix(jacobianMatrix);
+    calculateTransposedMatrix(jacobianMatrix, size,size);
     for(int i = 0; i < size; i++){
         for(int j = 0; j < size; j++){
             for(int k = 0; k < size; k++){
@@ -214,7 +215,7 @@ void NormalizedResidual::calculateHatMatrix(float *jacobianMatrix, float *gainMa
     }
 
     // * matriz de covariancia invertida
-    calculateInverseMatrix(covarianceMatrix);
+    calculateInverseMatrix(covarianceMatrix,size);
     for(int i = 0; i < size; i++){
         for(int j = 0; j < size; j++){
             for(int k = 0; k < size; k++){
@@ -302,9 +303,10 @@ void NormalizedResidual::LargestNormalizedResidualTest(float *measurementArray, 
 
     setMeasurementArray(measurementArray);
     setEstimatedMeasurementArray(estimatedArray);
-    calculateHatMatrix(jacobianMatrix, gainMatrix, covarianceMatrix);
-    calculateSensitivityMatrix();
-    calculateResidualCovarianceMatrix(covarianceMatrix);
+    setResidualCovarianceMatrix(covarianceMatrix);
+    // calculateHatMatrix(jacobianMatrix, gainMatrix, covarianceMatrix);
+    // calculateSensitivityMatrix();
+    // calculateResidualCovarianceMatrix(covarianceMatrix);
 
     float largestResidual;
     int position;
