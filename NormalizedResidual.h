@@ -36,7 +36,7 @@ class NormalizedResidual{
         void calculateInverseMatrix(float *, const int);
         void calculateTransposedMatrix(const float *, const int, const int);
 
-        void calculateHatMatrix(float *, float *, float *);
+        void calculateHatMatrix(float *, float *, float *, const int);
         void calculateSensitivityMatrix();
         void calculateResidualCovarianceMatrix(const float *);
 
@@ -45,6 +45,7 @@ class NormalizedResidual{
         void findLargestResidual(float &, int &);
         void deleteError(const int, const float, const int);
         void print(const float *);
+        void print(const int, const int);
 
         void LargestNormalizedResidualTest(float *, float *, float *, float *, float*);
         

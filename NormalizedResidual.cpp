@@ -100,7 +100,7 @@ float *NormalizedResidual::getNormalizedArray() const{
 //=======================================================================
 
 void NormalizedResidual::calculateInverseMatrix(float *matrix, const int length){
-
+    inverseMatrix = new float[length*length];
     inverseMatrix = matrix;
 
     //permutacao de linhas
@@ -178,41 +178,63 @@ void NormalizedResidual::calculateInverseMatrix(float *matrix, const int length)
 }
 
 void NormalizedResidual::calculateTransposedMatrix(const float *matrix, const int ROWS, const int COLUMNS){
-    
-    int rows = ROWS;
-    int columns = COLUMNS;
 
-    for(int i = 0; i < rows; i++){
-        for(int j = 0; j < columns; j++){
-            transposedMatrix[i*rows + j] = matrix[j*rows + i];
-            std::cout << std::setw(10) << transposedMatrix[i*rows+j];
+    transposedMatrix = new float[ROWS*COLUMNS];
+
+    for(int i = 0; i < ROWS; i++){
+        for(int j = 0; j < COLUMNS; j++){
+            transposedMatrix[j*ROWS + i] = matrix[i*COLUMNS + j];
         }
     }
 }
 
-void NormalizedResidual::calculateHatMatrix(float *jacobianMatrix, float *gainMatrix, float *covarianceMatrix){
+void NormalizedResidual::calculateHatMatrix(float *jacobianMatrix, float *gainMatrix, float *covarianceMatrix, const int length){
     //hatMatrix = matriz jacobiana * matriz de ganho invertida * matriz jacobiana transposta * matriz de covariancia invertida
-    hatMatrix = new float[size];
-    //matriz jacobiana * matriz de ganho invertida
-    calculateInverseMatrix(gainMatrix, size);
+    hatMatrix = new float[size*size];
     for(int i = 0; i < size; i++){
         for(int j = 0; j < size; j++){
-            for(int k = 0; k < size; k++){
-                hatMatrix[i*size + j] = 0;
-                hatMatrix[i*size + j] += jacobianMatrix[i*size + k]*inverseMatrix[k*size + j];
+            hatMatrix[i*size + j] = 0;
+        }
+    }
+
+    //matriz jacobiana * matriz de ganho invertida
+    calculateInverseMatrix(gainMatrix,length);
+    for(int i = 0; i < size; i++){
+        for(int j = 0; j < length; j++){
+            for(int k = 0; k < length; k++){
+                hatMatrix[i*size + j] += jacobianMatrix[i*length + k]*inverseMatrix[k*length + j];
+                 
             }
         }
     }
 
+
+    //==============print
+
+
     // * matriz jacobiana transposta
-    calculateTransposedMatrix(jacobianMatrix, size,size);
+    calculateTransposedMatrix(jacobianMatrix,size,length);
     for(int i = 0; i < size; i++){
         for(int j = 0; j < size; j++){
-            for(int k = 0; k < size; k++){
-                hatMatrix[i*size + j] += hatMatrix[i*size + k]*transposedMatrix[k*size + j];
+            for(int k = 0; k < length; k++){
+                hatMatrix[i*size + j] += hatMatrix[i*length + k]*transposedMatrix[k*size + j];
             }
         }
     }
+
+
+       //==============print
+
+    for(int i = 0; i < size; i++){
+        for(int j = 0; j < size; j++){
+            std::cout << std::setw(20) << hatMatrix[i*size + j];
+        }
+        std::cout << std::endl;
+    }
+        std::cout << std::endl;
+        std::cout << std::endl;
+    
+
 
     // * matriz de covariancia invertida
     calculateInverseMatrix(covarianceMatrix,size);
@@ -297,6 +319,15 @@ void NormalizedResidual::print(const float *ptr){
         std::cout << std::setw(10) << std::setprecision(3) << ptr[i] ;
     }
     std::cout << std::endl;
+}
+
+void NormalizedResidual::print( const int rows, const int columns){
+    for(int i = 0; i < rows; i++){
+        for(int j = 0; j < columns; j++){
+            std::cout << std::setw(20) << hatMatrix[i*columns + j];
+        }
+    std::cout << std::endl;
+    }
 }
 
 void NormalizedResidual::LargestNormalizedResidualTest(float *measurementArray, float *estimatedArray, float *jacobianMatrix, float *gainMatrix, float *covarianceMatrix){

@@ -17,35 +17,46 @@ int main(){
     //                                    {0,0,0, 0.000006805,0},
     //                                    {0,0,0,0, 0.0000405}};
 
-    const int size = 4;
+    const int size = 3;
     const float threshold = 3.0;
     int x =0, y = 0;
 
-    float measurementArray[] = {3.90, -4.05, -0.48, 2.04};
-    float estimatedArray[] = {3.992, -3.61, -0.374, 2.09};
-    float jacobianMatrix[][2] = {{-50, -100},
-                                {150,-100},
-                                {-100,200},
-                                {0, -100}};
-    float gainMatrix[][2] = {{1812500, -18750000},
-                             {-18750000, 57500000}};
-    float covarianceMatrix[][size] = {{0.001, 0,0,0},
-                                      {0,0.004,0,0},
-                                      {0,0, 0.001,0},
-                                      {0,0,0, 0.002}};
+    // float measurementArray[] = {3.90, -4.05, -0.48, 2.04};
+    // float estimatedArray[] = {3.992, -3.61, -0.374, 2.09};
+    // float jacobianMatrix[][2] = {{-50, -100},
+    //                             {150,-100},
+    //                             {-100,200},
+    //                             {0, -100}};
+    // float gainMatrix[][2] = {{1812500, -18750000},
+    //                          {-18750000, 57500000}};
+    // float covarianceMatrix[][size] = {{0.001, 0,0,0},
+    //                                   {0,0.004,0,0},
+    //                                   {0,0, 0.001,0},
+    //                                   {0,0,0, 0.002}};
 
-    float sensitivityMatrix[][3] = {{0.4916,-0.2236,0.3577},
-                                    {-0.2236,0.1017,-0.1627},
-                                    {0.5589,-0.2542,0.4068}}; 
+    // float sensitivityMatrix[][3] = {{0.4916,-0.2236,0.3577},
+    //                                 {-0.2236,0.1017,-0.1627},
+    //                                 {0.5589,-0.2542,0.4068}}; 
+    
+    
+    
+    
+    float jacobianMatrix[][2] = {{-33.33, 0},
+                                {0,-20},
+                                {45.8,-12.5}};
+    float gainMatrix[][2] = {{38370000, -5729000},
+                             {-5729000, 7812000}};
+    float covarianceMatrix[][size] = {{0.000064, 0,0},
+                                      {0,0.000064,0},
+                                      {0,0, 0.0001}};
 
     float *jPtr = jacobianMatrix[0];
     float *gPtr = gainMatrix[0];
     float *cmPtr = covarianceMatrix[0];
 
     HipothesisTest HTITest(x,y,size,threshold);
-    HTITest.setSensitivityMatrix(jPtr);
-    HTITest.calculateTransposedMatrix(HTITest.getSensitivityMatrix(),4,2);
-
+    HTITest.calculateHatMatrix(jPtr,gPtr,cmPtr,2);
+    HTITest.print(3,3);
 
     return 0;
 }
