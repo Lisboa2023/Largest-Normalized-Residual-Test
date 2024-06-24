@@ -46,6 +46,64 @@ void HipothesisTest::setNumberNonSelectedMeasurements(int numberNonSelectedMeasu
     number_non_selected_measurements = numberNonSelectedMeasurements;
 }
 
+
+//Funcoes GET ===========================================================
+
+int HipothesisTest::getNumberSelectedMeasurements() const{
+    return number_selected_measurements;
+}
+
+int HipothesisTest::getNumberNonSelectedMeasurements() const{
+    return number_non_selected_measurements;
+}
+
+float HipothesisTest::setNBeta() const{
+    return N_beta;
+}
+
+float HipothesisTest::setNMaximus() const{
+    return N_maximus;
+}
+
+float *HipothesisTest::getNonSelectedMeasurements()const{
+    return non_selected_measurements;
+}
+
+float *HipothesisTest::getSuspectSelectedMeasurements()const{
+    return suspect_selected_measurements;
+}
+
+float *HipothesisTest::getSuspectResidualCovarianceMatrix()const{
+    return suspect_residual_covariance_matrix;
+}
+
+float *HipothesisTest::getSuspectErrorMeasurements()const{
+    return suspect_error_measurements;
+}
+
+float *HipothesisTest::getTrueMeasurements()const{
+    return true_measurements;
+}
+
+float *HipothesisTest::getSensitivityMatrixSS()const{
+    return sensitivity_matrix_SS;
+}
+
+float *HipothesisTest::getInverseSensitivityMatrixSS()const{
+    return inverse_sensitivity_matrix_ss;
+}
+
+float *HipothesisTest::getSensitivityMatrixST()const{
+    return sensitivity_matrix_ST;
+}
+
+float *HipothesisTest::getSuspectResidualMeasurements()const{
+    return suspect_residual_measurements;
+}
+
+//=========================================================================  
+
+
 //=======================================================================
 
 void HipothesisTest::SelectSuspectMeasurements(){
@@ -58,10 +116,9 @@ void HipothesisTest::SelectSuspectMeasurements(){
         if(temp[i] > normalizedThreshold){
             number_selected_measurements++;
         }
-        else{
-            number_non_selected_measurements++;
-        }
     }
+
+    number_non_selected_measurements = num - number_selected_measurements;
 
     suspect_selected_measurements = new float[number_selected_measurements];
     non_selected_measurements = new float[number_non_selected_measurements];
@@ -84,13 +141,20 @@ void HipothesisTest::SelectSuspectMeasurements(){
 void HipothesisTest::SelectSuspectResidualCovarianceMatrix(){
     int num = getNumberOfMeasurements();
     float *temp = getResidualCovarianceMatrix();
-    int j;
+    int k;
 
     suspect_residual_covariance_matrix = new float[number_selected_measurements];
 
     for(int i = 0; i < number_selected_measurements; i++){
-        j = suspect_selected_measurements[i];
-        suspect_residual_covariance_matrix[i] = temp[j*num + j];
+        for(int j = 0; j < number_selected_measurements; j++){
+            if(i == j){
+                k = suspect_selected_measurements[i];
+                suspect_residual_covariance_matrix[i*number_selected_measurements + j] = temp[k*num + k];
+            }
+            else{
+                suspect_residual_covariance_matrix[i*number_selected_measurements + j] = 0;
+            }
+        }
     }
 }
 
@@ -121,13 +185,21 @@ void HipothesisTest::SelectTrueMeasurements(){
 void HipothesisTest::SelectSensitivityMatrixSS(){
     int num = getNumberOfMeasurements();
     float *temp = getSensitivityMatrix();
-    int j;
+    int k;
 
-    sensitivity_matrix_SS = new float[number_selected_measurements];
+    sensitivity_matrix_SS = new float[number_selected_measurements*number_selected_measurements];
     
     for(int i = 0; i < number_selected_measurements; i++){
-        j = suspect_selected_measurements[i];
-        sensitivity_matrix_SS[i] = temp[j*num + j];
+        for(int j = 0; j < number_selected_measurements; j++){
+            if(i==j){
+                k = suspect_selected_measurements[i];
+                sensitivity_matrix_SS[i*number_selected_measurements + j] = temp[k*num + k];
+            }
+            else{
+                sensitivity_matrix_SS[i*number_selected_measurements + j] = 0;
+            }
+
+        }
     }
 }
 
@@ -142,10 +214,10 @@ void HipothesisTest::SelectSensitivityMatrixST(){
 void HipothesisTest::CalculateInverseSensitivityMatrixSS(){
 
     inverse_sensitivity_matrix_ss = new float[number_selected_measurements];
-    // chama função de inversao de matriz
-    calculateInverseMatrix(sensitivity_matrix_SS, getNumberOfMeasurements());
-    inverse_sensitivity_matrix_ss = getInverseMatrix();
 
+    inverse_sensitivity_matrix_ss = CalculateInverseMatrix(sensitivity_matrix_SS, getNumberOfMeasurements());
+    CalculateInverseMatrix(sensitivity_matrix_SS, getNumberOfMeasurements());
+    
 }
 
 void HipothesisTest::CalculateSuspectResidualMeasurements(){
@@ -207,12 +279,4 @@ void HipothesisTest::SelectMeasurements(){
         }
     }
 
-}
-
-void HipothesisTest::printHTI(){
-
-    for (int i = 0; i < number_selected_measurements; i++){
-        std::cout << std::setw(10) << suspect_error_measurements[i];
-    }
-    std::cout << std::endl;
 }

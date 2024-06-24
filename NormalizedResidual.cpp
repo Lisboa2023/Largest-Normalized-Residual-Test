@@ -9,6 +9,7 @@ NormalizedResidual::NormalizedResidual(const int SIZE, const float THRESHOLD){
 
     measurement = new float[SIZE];
     estimatedMeasurement = new float[SIZE];
+    hatMatrix = new float[SIZE*SIZE];
     sensitivityMatrix = new float[SIZE*SIZE];
     residualCovarianceMatrix = new float[SIZE*SIZE];
     residualArray = new float[SIZE];
@@ -16,8 +17,7 @@ NormalizedResidual::NormalizedResidual(const int SIZE, const float THRESHOLD){
 }
 
 NormalizedResidual::~NormalizedResidual(){
-    delete [] inverseMatrix;
-    delete [] transposedMatrix;
+
     delete [] measurement;
     delete [] estimatedMeasurement;
     delete [] residualArray;
@@ -29,7 +29,7 @@ NormalizedResidual::~NormalizedResidual(){
 
 //Funcoes SET ==========================================================================================
 void NormalizedResidual::setNumberOfMeasurements(const int SIZE){
-    size = SIZE;
+    number_of_measurements = SIZE;
 }
 
 void NormalizedResidual::setThreshold(const float THRESHOLD){
@@ -70,15 +70,15 @@ void NormalizedResidual::setNormalizedArray(float *nArray){
 
 //Funcoes GET============================================================
 int NormalizedResidual::getNumberOfMeasurements() const{
-    return size;
+    return number_of_measurements;
 }
 
 float NormalizedResidual::getThreshold() const{
     return threshold;
 }
 
-float *NormalizedResidual::getInverseMatrix() const{
-    return inverseMatrix;
+float *NormalizedResidual::getHatMatrix() const{
+    return hatMatrix;
 }
 
 float *NormalizedResidual::getSensitivityMatrix() const{
@@ -99,8 +99,8 @@ float *NormalizedResidual::getNormalizedArray() const{
 
 //=======================================================================
 
-void NormalizedResidual::calculateInverseMatrix(float *matrix, const int length){
-    inverseMatrix = new float[length*length];
+float *NormalizedResidual::CalculateInverseMatrix(float *matrix, const int length){
+    float *inverseMatrix = new float[length*length];
     inverseMatrix = matrix;
 
     //permutacao de linhas
@@ -175,85 +175,66 @@ void NormalizedResidual::calculateInverseMatrix(float *matrix, const int length)
         }
     }
 
+    return inverseMatrix;
+
 }
 
-void NormalizedResidual::calculateTransposedMatrix(const float *matrix, const int ROWS, const int COLUMNS){
+float *NormalizedResidual::CalculateTransposedMatrix(const float *matrix, const int ROWS, const int COLUMNS){
 
-    transposedMatrix = new float[ROWS*COLUMNS];
+    float *transposedMatrix = new float[ROWS*COLUMNS];
 
     for(int i = 0; i < ROWS; i++){
         for(int j = 0; j < COLUMNS; j++){
             transposedMatrix[j*ROWS + i] = matrix[i*COLUMNS + j];
         }
     }
+
+    return transposedMatrix;
+}
+
+float *NormalizedResidual::MultiplyArray(const float *array_a,const float *array_b, const int rows_a, const int columns_a, const int rows_b, const int columns_b){
+
+    float *temp = new float[rows_a*columns_b];
+
+    for(int i = 0; i < rows_a; i++){
+        for(int j = 0; j < columns_b; j++){
+            for(int k = 0; k < rows_b; k++){
+                if(k == 0){
+                    temp[i*columns_b + j] = array_a[i*columns_a + k]*array_b[k*columns_b + j];
+                }
+
+                else{   
+                    temp[i*columns_b + j] += array_a[i*columns_a + k]*array_b[k*columns_b + j];
+                }
+            }
+        }
+    }
+
+    return temp;
 }
 
 void NormalizedResidual::calculateHatMatrix(float *jacobianMatrix, float *gainMatrix, float *covarianceMatrix, const int length){
+    
     //hatMatrix = matriz jacobiana * matriz de ganho invertida * matriz jacobiana transposta * matriz de covariancia invertida
-    hatMatrix = new float[size*size];
-    for(int i = 0; i < size; i++){
-        for(int j = 0; j < size; j++){
-            hatMatrix[i*size + j] = 0;
-        }
-    }
+    float *tempInverse = CalculateInverseMatrix(gainMatrix,length);
+    float *temp = MultiplyArray(jacobianMatrix,tempInverse,number_of_measurements,length,length,length);
 
-    //matriz jacobiana * matriz de ganho invertida
-    calculateInverseMatrix(gainMatrix,length);
-    for(int i = 0; i < size; i++){
-        for(int j = 0; j < length; j++){
-            for(int k = 0; k < length; k++){
-                hatMatrix[i*size + j] += jacobianMatrix[i*length + k]*inverseMatrix[k*length + j];
-                 
-            }
-        }
-    }
+    float *tempTransposed = CalculateTransposedMatrix(jacobianMatrix,number_of_measurements,length);
+    temp = MultiplyArray(temp,tempTransposed,number_of_measurements,length,length,number_of_measurements);
 
+    tempInverse = CalculateInverseMatrix(covarianceMatrix,number_of_measurements);
+    hatMatrix = MultiplyArray(temp,tempInverse,number_of_measurements,number_of_measurements,number_of_measurements,number_of_measurements);
 
-    //==============print
-
-
-    // * matriz jacobiana transposta
-    calculateTransposedMatrix(jacobianMatrix,size,length);
-    for(int i = 0; i < size; i++){
-        for(int j = 0; j < size; j++){
-            for(int k = 0; k < length; k++){
-                hatMatrix[i*size + j] += hatMatrix[i*length + k]*transposedMatrix[k*size + j];
-            }
-        }
-    }
-
-
-       //==============print
-
-    for(int i = 0; i < size; i++){
-        for(int j = 0; j < size; j++){
-            std::cout << std::setw(20) << hatMatrix[i*size + j];
-        }
-        std::cout << std::endl;
-    }
-        std::cout << std::endl;
-        std::cout << std::endl;
-    
-
-
-    // * matriz de covariancia invertida
-    calculateInverseMatrix(covarianceMatrix,size);
-    for(int i = 0; i < size; i++){
-        for(int j = 0; j < size; j++){
-            for(int k = 0; k < size; k++){
-                hatMatrix[i*size + j] += covarianceMatrix[i*size + k]*inverseMatrix[k*size + j];
-            }
-        }
-    }
-    
+    //Retorna as matrizes de Ganhio e Covariancia para seus valores originais
+    CalculateInverseMatrix(covarianceMatrix,number_of_measurements);
 }
 
 void NormalizedResidual::calculateSensitivityMatrix(){
 
     //Criando Matrix Identidade =============================================
-    bool identityMatrix[size][size];
-    for(int i = 0; i < size; i++){
-        for(int j = 0; j < size; j++){
+    bool identityMatrix[number_of_measurements][number_of_measurements];
+    for(int i = 0; i < number_of_measurements; i++){
+        for(int j = 0; j < number_of_measurements; j++){
             if(i==j){
                 identityMatrix[i][j] = 1;
             }
@@ -264,40 +245,39 @@ void NormalizedResidual::calculateSensitivityMatrix(){
     }
     //======================================================================
 
-    for(int i = 0; i < size; i++){
-        for(int j = 0; j < size; j++){
-            sensitivityMatrix[i*size + j] = identityMatrix[i][j] - hatMatrix[i*size + j];
+    for(int i = 0; i < number_of_measurements; i++){
+        for(int j = 0; j < number_of_measurements; j++){
+            sensitivityMatrix[i*number_of_measurements + j] = identityMatrix[i][j] - hatMatrix[i*number_of_measurements + j];
         }
     } 
+
 }
 
-void NormalizedResidual::calculateResidualCovarianceMatrix(const float *covarianceMatrix){
+void NormalizedResidual::calculateResidualCovarianceMatrix(float *covarianceMatrix){
 
-    for(int i = 0; i < size; i++){
-        for(int j = 0; j < size; j++){
-            for(int k = 0; k < size; k++){
-                residualCovarianceMatrix[i*size + j] = 0;
-                residualCovarianceMatrix[i*size + j] += sensitivityMatrix[i*size + k]*covarianceMatrix[k*size + j];
-            }
-        }
-    }
+    residualCovarianceMatrix = MultiplyArray(sensitivityMatrix,covarianceMatrix,number_of_measurements,number_of_measurements,number_of_measurements,number_of_measurements);
+
 }
 
 void NormalizedResidual::calculateResidualArray(){
-    for(int i = 0; i < size; i++){
+
+    for(int i = 0; i < number_of_measurements; i++){
         residualArray[i] = measurement[i] - estimatedMeasurement[i];
     }
+
 }
 
 void NormalizedResidual::calculateNormalizedResidualArray(){
-    for(int i = 0; i < size; i++){
-        normalizedArray[i] = fabs(residualArray[i])/sqrt(residualCovarianceMatrix[i*size + i]);
+
+    for(int i = 0; i < number_of_measurements; i++){
+        normalizedArray[i] = fabs(residualArray[i])/sqrt(residualCovarianceMatrix[i*number_of_measurements + i]);
     }
+
 }
 
 void NormalizedResidual::findLargestResidual(float &temp, int &pos){
     temp = *normalizedArray;
-    for(int i = 0; i < size; i++){
+    for(int i = 0; i < number_of_measurements; i++){
         if(normalizedArray[i] >= temp){
             temp = normalizedArray[i];
             pos = i;
@@ -314,48 +294,75 @@ void NormalizedResidual::deleteError(const int threshold, const float lg, const 
     }  
 }
 
-void NormalizedResidual::print(const float *ptr){
-    for(int i = 0; i < size; i++){
-        std::cout << std::setw(10) << std::setprecision(3) << ptr[i] ;
-    }
-    std::cout << std::endl;
-}
-
-void NormalizedResidual::print( const int rows, const int columns){
+void NormalizedResidual::print(const float *array, const int rows, const int columns){
     for(int i = 0; i < rows; i++){
         for(int j = 0; j < columns; j++){
-            std::cout << std::setw(20) << hatMatrix[i*columns + j];
+            std::cout << std::setw(20) << array[i*columns + j];
         }
-    std::cout << std::endl;
+        std::cout << std::endl;
     }
+
+    std::cout << std::endl;
 }
 
-void NormalizedResidual::LargestNormalizedResidualTest(float *measurementArray, float *estimatedArray, float *jacobianMatrix, float *gainMatrix, float *covarianceMatrix){
+void NormalizedResidual::LargestNormalizedResidualTest(float *measurementArray, float *estimatedArray, float *residualCovarianceMatrix){
 
     setMeasurementArray(measurementArray);
     setEstimatedMeasurementArray(estimatedArray);
-    setResidualCovarianceMatrix(covarianceMatrix);
-    // calculateHatMatrix(jacobianMatrix, gainMatrix, covarianceMatrix);
-    // calculateSensitivityMatrix();
-    // calculateResidualCovarianceMatrix(covarianceMatrix);
+    setResidualCovarianceMatrix(residualCovarianceMatrix);
 
     float largestResidual;
     int position;
 
-    for(int i=0; i < size; i++){
+    for(int i=0; i < number_of_measurements; i++){
         calculateResidualArray();
         calculateNormalizedResidualArray();
         if(i==0){
             std::cout << "Conjunto de medicoes residuais: " << std::endl; 
-            print(residualArray);
+            print(residualArray, number_of_measurements, 0);
             std::cout << std::endl << "Conjunto de medicoes residuais normalizadas: " << std::endl; 
-            print(normalizedArray);
+            print(normalizedArray, number_of_measurements, 0);
             std::cout << std::endl << "Limite: " << std::setprecision(3) <<threshold << std::endl;
         }
         findLargestResidual(largestResidual, position);
         if (largestResidual > threshold){ 
             deleteError(threshold, largestResidual, position);
-            print(normalizedArray);
+            print(normalizedArray, 0, number_of_measurements);
+        }
+        else{
+            std::cout << std::endl << "Conjunto de medicoes livre de erro!" << std::endl <<
+            std::endl;
+            break;
+        }
+    }
+}
+
+void NormalizedResidual::LargestNormalizedResidualTest(float *measurementArray, float *estimatedArray, float *jacobianMatrix, float *gainMatrix, float *covarianceMatrix,const int length){
+
+    setMeasurementArray(measurementArray);
+    setEstimatedMeasurementArray(estimatedArray);
+    setResidualCovarianceMatrix(covarianceMatrix);
+    calculateHatMatrix(jacobianMatrix, gainMatrix, covarianceMatrix,length);
+    calculateSensitivityMatrix();
+    calculateResidualCovarianceMatrix(covarianceMatrix);
+
+    float largestResidual;
+    int position;
+
+    for(int i=0; i < number_of_measurements; i++){
+        calculateResidualArray();
+        calculateNormalizedResidualArray();
+        if(i==0){
+            std::cout << "Conjunto de medicoes residuais: " << std::endl; 
+            print(residualArray, number_of_measurements, 0);
+            std::cout << std::endl << "Conjunto de medicoes residuais normalizadas: " << std::endl; 
+            print(normalizedArray, number_of_measurements, 0);
+            std::cout << std::endl << "Limite: " << std::setprecision(3) <<threshold << std::endl;
+        }
+        findLargestResidual(largestResidual, position);
+        if (largestResidual > threshold){ 
+            deleteError(threshold, largestResidual, position);
+            print(normalizedArray, 0, number_of_measurements);
         }
         else{
             std::cout << std::endl << "Conjunto de medicoes livre de erro!" << std::endl <<
