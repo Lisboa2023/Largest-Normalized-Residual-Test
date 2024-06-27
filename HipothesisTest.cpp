@@ -205,8 +205,25 @@ void HipothesisTest::SelectSensitivityMatrixSS(){
 
 void HipothesisTest::SelectSensitivityMatrixST(){
 
-    sensitivity_matrix_ST = new float[number_selected_measurements];
+    int num = getNumberOfMeasurements();
+    float *temp = getSensitivityMatrix();
+    int k;
+
+    sensitivity_matrix_ST = new float[num*num];
     //achar matriz de sensibilidade ST
+
+    for(int i = 0; i < number_selected_measurements; i++){
+        k = suspect_selected_measurements[i];
+        for(int j = 0; j < num; j++){
+            for(int n = 0; n < num; n++){
+
+                if((j == k || n == k)){
+                    sensitivity_matrix_ST[j*num + n] = temp[j*num + n];
+                }
+
+            }
+        }
+    }
 
 }
 

@@ -160,6 +160,10 @@ int main(){
     std::cout << "Sensitivity Matrix SS " << std::endl;
     HTITest.print(HTITest.getSensitivityMatrixSS(),HTITest.getNumberSelectedMeasurements(),HTITest.getNumberSelectedMeasurements());
 
+    HTITest.SelectSensitivityMatrixST();
+    std::cout << "Sensitivity Matrix ST " << std::endl;
+    HTITest.print(HTITest.getSensitivityMatrixST(),HTITest.getNumberOfMeasurements(),HTITest.getNumberOfMeasurements());
+
     return 0;
 }
 
