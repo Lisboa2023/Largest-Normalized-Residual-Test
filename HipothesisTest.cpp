@@ -209,22 +209,22 @@ void HipothesisTest::SelectSensitivityMatrixST(){
     float *temp = getSensitivityMatrix();
     int k;
 
-    sensitivity_matrix_ST = new float[num*num];
+    sensitivity_matrix_ST = new float[number_selected_measurements*number_non_selected_measurements];
     //achar matriz de sensibilidade ST
 
-    for(int j = 0; j < num; j++){
-        for(int n = 0; n < num; n++){
-            sensitivity_matrix_ST[j*num + n] = 0;
+    for(int i = 0; i < number_selected_measurements; i++){
+        for(int j = 0; j < number_non_selected_measurements; j++){
+            sensitivity_matrix_ST[i*number_non_selected_measurements + j] = 0;
         }
     }
 
     for(int i = 0; i < number_selected_measurements; i++){
         k = suspect_selected_measurements[i];
-        for(int j = 0; j < num; j++){
-            for(int n = 0; n < num; n++){
+        for(int j = 0; j < number_selected_measurements; j++){
+            for(int n = 0; n < number_non_selected_measurements; n++){
                 
                 if((j == k || n == k)){
-                    sensitivity_matrix_ST[j*num + n] = temp[j*num + n];
+                    sensitivity_matrix_ST[j*number_non_selected_measurements + n] = temp[j*num + n];
                 }
 
             }
@@ -249,7 +249,7 @@ void HipothesisTest::CalculateSuspectResidualMeasurements(){
     suspect_residual_measurements = new float[number_selected_measurements];
 
     suspect_residual_measurements = MultiplyArray(sensitivity_matrix_SS,suspect_error_measurements,number_selected_measurements,number_selected_measurements,number_selected_measurements,1);
-    temp = MultiplyArray(sensitivity_matrix_ST,true_measurements,);
+    temp = MultiplyArray(sensitivity_matrix_ST,true_measurements,number_selected_measurements,number_non_selected_measurements,number_non_selected_measurements,1);
     
     for(int i = 0; i < number_selected_measurements; i++){
         suspect_residual_measurements[i] = suspect_residual_measurements[i] + temp[i];
