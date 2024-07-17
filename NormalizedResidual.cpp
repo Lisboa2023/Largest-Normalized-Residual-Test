@@ -341,7 +341,6 @@ void NormalizedResidual::LargestNormalizedResidualTest(float *measurementArray, 
 
     setMeasurementArray(measurementArray);
     setEstimatedMeasurementArray(estimatedArray);
-    setResidualCovarianceMatrix(covarianceMatrix);
     calculateHatMatrix(jacobianMatrix, gainMatrix, covarianceMatrix,length);
     calculateSensitivityMatrix();
     calculateResidualCovarianceMatrix(covarianceMatrix);

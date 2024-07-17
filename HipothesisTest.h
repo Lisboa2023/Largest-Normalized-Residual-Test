@@ -50,6 +50,8 @@ class HipothesisTest:public NormalizedResidual{
 
         void SelectMeasurements();
 
+        void HypothesisTestIdentification(float*,float*,float*,float*);
+
     private:
         int number_selected_measurements;
         int number_non_selected_measurements;

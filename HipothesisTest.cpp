@@ -260,7 +260,7 @@ void HipothesisTest::CalculateEstimatedErrorMeasurements(){
 
     estimated_error_measurements = new float[number_selected_measurements];
     
-    estimated_error_measurements = MultiplyArray(inverse_sensitivity_matrix_ss,suspect_residual_measurements,number_selected_measurements,number_selected_measurements,number_selected_measurements,1);
+    estimated_error_measurements = MultiplyArray(inverse_sensitivity_matrix_ss,suspect_error_measurements,number_selected_measurements,number_selected_measurements,number_selected_measurements,1);
 
 }
 
@@ -303,5 +303,31 @@ void HipothesisTest::SelectMeasurements(){
             j++;
         }
     }
+
+    print(selected_measurements,1,count);
+
+}
+
+void HipothesisTest::HypothesisTestIdentification(float *residual_array,float *normalized_residual_array, float *sensitivity_matrix, float *residual_covariance_matrix){
+    
+    setSensitivityMatrix(sensitivity_matrix);
+    setResidualCovarianceMatrix(residual_covariance_matrix);
+    setResidualArray(residual_array);
+    setNormalizedArray(normalized_residual_array);
+
+    SelectSuspectMeasurements();
+    SelectSuspectResidualCovarianceMatrix();
+    SelectSuspectErrorMeasurements();
+    SelectSensitivityMatrixSS();
+
+    CalculateInverseSensitivityMatrixSS();
+    CalculateEstimatedErrorMeasurements();
+    print(estimated_error_measurements,1,number_selected_measurements);
+    CalculateNMeasurements();
+    print(N_measurements,1,number_selected_measurements);
+    CalculateThersholdMeasurements();
+    print(threshold_measurements,1,number_selected_measurements);
+
+    SelectMeasurements();
 
 }

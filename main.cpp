@@ -89,7 +89,7 @@ int main(){
     const int number_of_measurements = 4;
     const int number_of_bus = 2;
     const float threshold = 3.0;
-    int x = 0, y = 0;
+    int n_beta = -2.32, n_maximus = 3.0;
 
     
     float measurementArray[] = {3.90, -4.05, -0.48, 2.04};
@@ -109,71 +109,83 @@ int main(){
                                                         {0,0, 0.001,0},
                                                         {0,0,0, 0.002}};
 
+    float sensitivityMatrix[][number_of_measurements] = {{0.257919,0.158371,0.108597,0.199095},
+    {0.633484,0.669683,0.687783,-0.0723982},
+    {0.108597,0.171946,0.20362,-0.126697},
+    {0.39819,-0.0361991,-0.253394,0.868778}};
+
+    float residualArray[]= {-0.092,-0.44,-0.106,-0.05};
+    float normalizedArray[] = {2.9093, 6.95702, 3.35201, 1.11803};
+
+    float *rAPtr = residualArray;
+    float *nAPtr = normalizedArray;
+    float *sPtr = sensitivityMatrix[0];
     float *mPtr = measurementArray;
     float *emPtr = estimatedArray;
     float *jPtr = jacobianMatrix[0];
     float *gPtr = gainMatrix[0];
     float *cmPtr = covarianceMatrix[0];
 
-    HipothesisTest HTITest(x,y,number_of_measurements,threshold);
+    HipothesisTest HTITest(n_beta,n_maximus,number_of_measurements,threshold);
+    HTITest.HypothesisTestIdentification(rAPtr,nAPtr,sPtr,cmPtr);
 
 
-    HTITest.calculateHatMatrix(jPtr,gPtr,cmPtr,number_of_bus);
-    std::cout << "Hat Matrix" << std::endl;
-    HTITest.print(HTITest.getHatMatrix(),number_of_measurements,number_of_measurements);
+    // HTITest.calculateHatMatrix(jPtr,gPtr,cmPtr,number_of_bus);
+    // std::cout << "Hat Matrix" << std::endl;
+    // HTITest.print(HTITest.getHatMatrix(),number_of_measurements,number_of_measurements);
 
-    HTITest.calculateSensitivityMatrix();
-    std::cout << "Sensitivity Matrix" << std::endl;
-    HTITest.print(HTITest.getSensitivityMatrix(),number_of_measurements,number_of_measurements);
+    // HTITest.calculateSensitivityMatrix();
+    // std::cout << "Sensitivity Matrix" << std::endl;
+    // HTITest.print(HTITest.getSensitivityMatrix(),number_of_measurements,number_of_measurements);
 
-    HTITest.setResidualCovarianceMatrix(cmPtr);
-    std::cout << "Residual Covariance Matrix" << std::endl;
-    HTITest.print(HTITest.getResidualCovarianceMatrix(),number_of_measurements,number_of_measurements);
+    // HTITest.setResidualCovarianceMatrix(cmPtr);
+    // std::cout << "Residual Covariance Matrix" << std::endl;
+    // HTITest.print(HTITest.getResidualCovarianceMatrix(),number_of_measurements,number_of_measurements);
 
-    HTITest.setMeasurementArray(mPtr);
-    HTITest.setEstimatedMeasurementArray(emPtr);
-    HTITest.calculateResidualArray();
-    std::cout << "Residual Measurements" << std::endl;
-    HTITest.print(HTITest.getResidualArray(),1,number_of_measurements);
+    // HTITest.setMeasurementArray(mPtr);
+    // HTITest.setEstimatedMeasurementArray(emPtr);
+    // HTITest.calculateResidualArray();
+    // std::cout << "Residual Measurements" << std::endl;
+    // HTITest.print(HTITest.getResidualArray(),1,number_of_measurements);
 
-    HTITest.calculateNormalizedResidualArray();
-    std::cout << "Normalized Residual " << std::endl;
-    HTITest.print(HTITest.getNormalizedArray(),1,number_of_measurements);
+    // HTITest.calculateNormalizedResidualArray();
+    // std::cout << "Normalized Residual " << std::endl;
+    // HTITest.print(HTITest.getNormalizedArray(),1,number_of_measurements);
 
-    HTITest.SelectSuspectMeasurements();
-    std::cout << "Suspect Selected Measurements " << std::endl;
-    HTITest.print(HTITest.getSuspectSelectedMeasurements(),1,HTITest.getNumberSelectedMeasurements());
+    // HTITest.SelectSuspectMeasurements();
+    // std::cout << "Suspect Selected Measurements " << std::endl;
+    // HTITest.print(HTITest.getSuspectSelectedMeasurements(),1,HTITest.getNumberSelectedMeasurements());
 
-    std::cout << "Non Selected Measurements " << std::endl;
-    HTITest.print(HTITest.getNonSelectedMeasurements(),1,HTITest.getNumberNonSelectedMeasurements());
+    // std::cout << "Non Selected Measurements " << std::endl;
+    // HTITest.print(HTITest.getNonSelectedMeasurements(),1,HTITest.getNumberNonSelectedMeasurements());
 
-    HTITest.SelectSuspectResidualCovarianceMatrix();
-    std::cout << "Suspect Residual Covariance Matrix " << std::endl;
-    HTITest.print(HTITest.getSuspectResidualCovarianceMatrix(),HTITest.getNumberSelectedMeasurements(),HTITest.getNumberSelectedMeasurements());
+    // HTITest.SelectSuspectResidualCovarianceMatrix();
+    // std::cout << "Suspect Residual Covariance Matrix " << std::endl;
+    // HTITest.print(HTITest.getSuspectResidualCovarianceMatrix(),HTITest.getNumberSelectedMeasurements(),HTITest.getNumberSelectedMeasurements());
 
-    HTITest.SelectSuspectErrorMeasurements();
-    std::cout << "Suspect Error Measurements " << std::endl;
-    HTITest.print(HTITest.getSuspectErrorMeasurements(),1,HTITest.getNumberSelectedMeasurements());
+    // HTITest.SelectSuspectErrorMeasurements();
+    // std::cout << "Suspect Error Measurements " << std::endl;
+    // HTITest.print(HTITest.getSuspectErrorMeasurements(),1,HTITest.getNumberSelectedMeasurements());
 
-    HTITest.SelectTrueMeasurements();
-    std::cout << "True Measurements " << std::endl;
-    HTITest.print(HTITest.getTrueMeasurements(),1,HTITest.getNumberNonSelectedMeasurements());
+    // HTITest.SelectTrueMeasurements();
+    // std::cout << "True Measurements " << std::endl;
+    // HTITest.print(HTITest.getTrueMeasurements(),1,HTITest.getNumberNonSelectedMeasurements());
 
-    HTITest.SelectSensitivityMatrixSS();
-    std::cout << "Sensitivity Matrix SS " << std::endl;
-    HTITest.print(HTITest.getSensitivityMatrixSS(),HTITest.getNumberSelectedMeasurements(),HTITest.getNumberSelectedMeasurements());
+    // HTITest.SelectSensitivityMatrixSS();
+    // std::cout << "Sensitivity Matrix SS " << std::endl;
+    // HTITest.print(HTITest.getSensitivityMatrixSS(),HTITest.getNumberSelectedMeasurements(),HTITest.getNumberSelectedMeasurements());
 
-    HTITest.SelectSensitivityMatrixST();
-    std::cout << "Sensitivity Matrix ST " << std::endl;
-    HTITest.print(HTITest.getSensitivityMatrixST(),HTITest.getNumberOfMeasurements(),HTITest.getNumberOfMeasurements());
+    // HTITest.SelectSensitivityMatrixST();
+    // std::cout << "Sensitivity Matrix ST " << std::endl;
+    // HTITest.print(HTITest.getSensitivityMatrixST(),HTITest.getNumberOfMeasurements(),HTITest.getNumberOfMeasurements());
 
-    HTITest.CalculateInverseSensitivityMatrixSS();
-    std::cout << "Inverse Sensitivity Matrix SS " << std::endl;
-    HTITest.print(HTITest.getInverseSensitivityMatrixSS(),HTITest.getNumberSelectedMeasurements(),HTITest.getNumberSelectedMeasurements());
+    // HTITest.CalculateInverseSensitivityMatrixSS();
+    // std::cout << "Inverse Sensitivity Matrix SS " << std::endl;
+    // HTITest.print(HTITest.getInverseSensitivityMatrixSS(),HTITest.getNumberSelectedMeasurements(),HTITest.getNumberSelectedMeasurements());
     
-    HTITest.CalculateSuspectResidualMeasurements();
-    std::cout << "Suspect Residual Measurements " << std::endl;
-    HTITest.print(HTITest.getSuspectResidualMeasurements(),1,HTITest.getNumberSelectedMeasurements());
+    // HTITest.CalculateSuspectResidualMeasurements();
+    // std::cout << "Suspect Residual Measurements " << std::endl;
+    // HTITest.print(HTITest.getSuspectResidualMeasurements(),1,HTITest.getNumberSelectedMeasurements());
 
 
     return 0;
