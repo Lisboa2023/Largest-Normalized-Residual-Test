@@ -56,7 +56,7 @@ class HipothesisTest:public NormalizedResidual{
         float *estimated_error_measurements;
         float *N_measurements;
         float *threshold_measurements;
-        float *new_suspect_selected_measurements;
+        int new_number_suspect_measurements;
 
 };
 

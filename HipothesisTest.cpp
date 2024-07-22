@@ -9,6 +9,7 @@ HipothesisTest::HipothesisTest(const float nBeta, const float nMaximus, const in
     setNBeta(nBeta);
     setNMaximus(nMaximus);
     setNumberSelectedMeasurements(0);
+    new_number_suspect_measurements = 0;
 }
 
 HipothesisTest::~HipothesisTest(){
@@ -21,7 +22,6 @@ HipothesisTest::~HipothesisTest(){
     delete [] estimated_error_measurements;
     delete [] N_measurements;
     delete [] threshold_measurements;
-    delete [] new_suspect_selected_measurements;
 
 }
 
@@ -92,7 +92,6 @@ void HipothesisTest::SelectSuspectMeasurements(){
     suspect_selected_measurements = new float[number_selected_measurements];
     
     int count = 0;
-    int count1 = 0;
     for(int i = 0; i < num; i++){
         if(temp[i] > normalizedThreshold){   
             suspect_selected_measurements[count] = i;
@@ -193,15 +192,14 @@ void HipothesisTest::CalculateThersholdMeasurements(){
 }
 
 void HipothesisTest::SelectNewSuspectMeasurements(){
-
-    int number_suspect_measurements = 0;
+   
     for(int i = 0; i < number_selected_measurements; i++){
         if(fabs(estimated_error_measurements[i]) > threshold_measurements[i]){
-            number_suspect_measurements++;
+            new_number_suspect_measurements++;
         }
     } 
 
-    new_suspect_selected_measurements = new float[number_suspect_measurements];
+    float *new_suspect_selected_measurements = new float[new_number_suspect_measurements];
 
     int j = 0; 
     for(int i = 0; i < number_selected_measurements; i++){
@@ -211,7 +209,86 @@ void HipothesisTest::SelectNewSuspectMeasurements(){
         }
     }
 
-    print(new_suspect_selected_measurements,1,number_suspect_measurements);
+    print(new_suspect_selected_measurements,1,new_number_suspect_measurements);
+
+    float *new_suspect_residual_measurements = new float[new_number_suspect_measurements];
+    float *new_suspect_residual_covariance_matrix = new float[new_number_suspect_measurements*new_number_suspect_measurements];
+    float *new_sensitivity_matrix_ss = new float[new_number_suspect_measurements*new_number_suspect_measurements];
+
+    int k;
+    if(number_selected_measurements > new_number_suspect_measurements){
+        
+        //Novas medicoes residuais
+        for(int i = 0; i < new_number_suspect_measurements; i++){
+            k = new_suspect_selected_measurements[i];
+            new_suspect_residual_measurements[i] = suspect_residual_measurements[k];
+        }
+
+        delete [] suspect_residual_measurements;
+
+        suspect_residual_measurements = new float[new_number_suspect_measurements];
+
+        for(int i = 0; i < new_number_suspect_measurements; i++){
+            suspect_residual_measurements[i] = new_suspect_residual_measurements[i];
+        }
+
+        //Nova matrix de covariancia residual
+        for(int i = 0; i < new_number_suspect_measurements; i++){
+            for(int j = 0; j < new_number_suspect_measurements; j++){
+                if(i == j){
+                    k = new_suspect_selected_measurements[i];
+                    new_suspect_residual_covariance_matrix[i*new_number_suspect_measurements + j] = suspect_residual_covariance_matrix[k*number_selected_measurements + k];
+                }
+
+                else{
+                    new_suspect_residual_covariance_matrix[i*new_number_suspect_measurements + j] = 0;
+                }
+            }
+        }
+
+        delete [] suspect_residual_covariance_matrix;
+
+        suspect_residual_covariance_matrix = new float [new_number_suspect_measurements*new_number_suspect_measurements];
+
+        for(int i = 0; i < new_number_suspect_measurements; i++){
+            for(int j = 0; j < new_number_suspect_measurements; j++){
+                suspect_residual_covariance_matrix[i*new_number_suspect_measurements + j] = new_suspect_residual_covariance_matrix[i*new_number_suspect_measurements + j];
+            }
+        }
+
+        //Nova matrix de sensibilidade residual
+        for(int i = 0; i < new_number_suspect_measurements; i++){
+            for(int j = 0; j < new_number_suspect_measurements; j++){
+                if(i==j){
+                    k = new_suspect_selected_measurements[i];
+                    new_sensitivity_matrix_ss[i*new_number_suspect_measurements + j] = sensitivity_matrix_SS[k*number_selected_measurements + k];
+                }
+
+                else{
+                    new_sensitivity_matrix_ss[i*new_number_suspect_measurements + j] = 0;
+                }
+            }
+        }
+
+        delete [] sensitivity_matrix_SS;
+
+        sensitivity_matrix_SS = new float[new_number_suspect_measurements];
+
+        for(int i = 0; i < new_number_suspect_measurements; i++){
+            for(int j = 0; j < new_number_suspect_measurements; j++){
+                sensitivity_matrix_SS[i*new_number_suspect_measurements + j] = new_sensitivity_matrix_ss[i*number_selected_measurements + j];
+            }
+        }
+
+        //Novo numero de mediçoes
+        number_selected_measurements = new_number_suspect_measurements;
+
+        delete [] new_suspect_selected_measurements;
+        delete [] new_suspect_residual_measurements;
+        delete [] new_suspect_residual_covariance_matrix;
+        delete [] new_sensitivity_matrix_ss;
+
+    }
 
 }
 
@@ -226,17 +303,27 @@ void HipothesisTest::HypothesisTestIdentification(float *residual_array,float *n
     SelectSuspectResidualCovarianceMatrix();
     SelectSuspectResidualMeasurements();
     SelectSensitivityMatrixSS();
+    std::cout << "Sensitivity Matrix SS" << std::endl;
     print(sensitivity_matrix_SS,number_selected_measurements,number_selected_measurements);
 
-    CalculateInverseSensitivityMatrixSS();
-    print(inverse_sensitivity_matrix_ss,number_selected_measurements,number_selected_measurements);
-    CalculateEstimatedErrorMeasurements();
-    print(estimated_error_measurements,1,number_selected_measurements);
-    CalculateNMeasurements();
-    print(N_measurements,1,number_selected_measurements);
-    CalculateThersholdMeasurements();
-    print(threshold_measurements,1,number_selected_measurements);
-
-    SelectNewSuspectMeasurements();
-
+    while (number_selected_measurements > new_number_suspect_measurements)
+    {
+    
+        CalculateInverseSensitivityMatrixSS();
+        std::cout << "Inverse Sensitivity Matrix SS" << std::endl;
+        print(inverse_sensitivity_matrix_ss,number_selected_measurements,number_selected_measurements);
+        CalculateEstimatedErrorMeasurements();
+        std::cout << "Estimated Error" << std::endl;
+        print(estimated_error_measurements,1,number_selected_measurements);
+        CalculateNMeasurements();
+        std::cout << "N measurements" << std::endl;
+        print(N_measurements,1,number_selected_measurements);
+        CalculateThersholdMeasurements();
+        std::cout << "Threshold" << std::endl;    
+        print(threshold_measurements,1,number_selected_measurements);
+        std::cout << "New Suspect Measurements" << std::endl;
+        SelectNewSuspectMeasurements();
+        
+    }
+    
 }
