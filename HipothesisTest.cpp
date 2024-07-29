@@ -288,6 +288,10 @@ void HipothesisTest::SelectNewSuspectMeasurements(){
         delete [] new_suspect_residual_covariance_matrix;
         delete [] new_sensitivity_matrix_ss;
 
+        delete [] estimated_error_measurements;
+        delete [] N_measurements;
+        delete [] threshold_measurements;
+
     }
 
 }
