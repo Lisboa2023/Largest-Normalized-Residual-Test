@@ -1,5 +1,5 @@
-#ifndef NORMALIZEDRESIDUAL_H
-#define NORMALIZEDRESIDUAL_H
+#ifndef LNRTEST_H
+#define LNRTEST_H
 
 class NormalizedResidual{
     public:
@@ -14,10 +14,8 @@ class NormalizedResidual{
         void setSensitivityMatrix(float *);
         void setResidualCovarianceMatrix(float *);
 
-        void setMeasurementArray(float *);
-        void setEstimatedMeasurementArray(float *);
-        void setResidualArray(float *);
-        void setNormalizedArray(float *);
+        void setResidualMeasurements(float *);
+        void setNormalizedMeasurements(float *);
         //=======================================================================
 
         //Funcoes GET============================================================
@@ -28,8 +26,8 @@ class NormalizedResidual{
         float *getSensitivityMatrix() const;
         float *getResidualCovarianceMatrix() const;
         
-        float *getResidualArray() const;
-        float *getNormalizedArray() const;
+        float *getResidualMeasurements() const;
+        float *getNormalizedMeasurements() const;
 
         //=======================================================================
         
@@ -37,15 +35,15 @@ class NormalizedResidual{
         float *CalculateTransposedMatrix(const float *, const int, const int);
         float *MultiplyArray(const float *, const float *, const int, const int, const int, const int);
 
-        void calculateHatMatrix(float *, float *,float *, const int);
-        void calculateSensitivityMatrix();
-        void calculateResidualCovarianceMatrix(float *);
+        void CalculateHatMatrix(float *, float *,float *, const int);
+        void CalculateSensitivityMatrix();
+        void CalculateResidualCovarianceMatrix(float *);
 
-        void calculateResidualArray();
-        void calculateNormalizedResidualArray();
+        void CalculateResidualMeasurements(const float *,const float *);
+        void CalculateNormalizedResidualMeasurements();
 
-        void findLargestResidual(float &, int &);
-        void deleteError(const int, const float, const int);
+        void FindLargestResidual(float &, int &);
+        void DeleteError(const int, const float, const int,float *,float *);
         void print(const float*, const int, const int);
 
         void LargestNormalizedResidualTest(float *, float *, float *);
@@ -55,14 +53,12 @@ class NormalizedResidual{
         int number_of_measurements;
         float threshold;
 
-        float *hatMatrix;
-        float *sensitivityMatrix;
-        float *residualCovarianceMatrix;
+        float *hat_matrix;
+        float *sensitivity_matrix;
+        float *residual_covariance_matrix;
 
-        float *measurement;
-        float *estimatedMeasurement;
-        float *residualArray;
-        float *normalizedArray;
+        float *residual_measurements;
+        float *normalized_measurements;
 
 };
 

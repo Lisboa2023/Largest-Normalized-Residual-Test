@@ -1,12 +1,12 @@
 #ifndef HTI_H
 #define HTI_H
 
-#include"NormalizedResidual.h"
+#include"LargestNormalizedResidualTest.h"
 
-class HipothesisTest:public NormalizedResidual{
+class HypothesisTest:public NormalizedResidual{
     public:
-        HipothesisTest(const float, const float, const int, const float);
-        ~HipothesisTest();
+        HypothesisTest(const float, const float, const int, const float);
+        ~HypothesisTest();
 
         //Funcoes SET ============================================================
         void setNBeta(float);
@@ -17,7 +17,6 @@ class HipothesisTest:public NormalizedResidual{
 
         //Funcoes GET ===========================================================
         int getNumberSelectedMeasurements() const;
-        int getNumberNonSelectedMeasurements() const;
         float setNBeta() const;
         float setNMaximus() const;
 
