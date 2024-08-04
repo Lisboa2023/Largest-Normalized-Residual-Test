@@ -42,6 +42,7 @@ class HypothesisTest:public NormalizedResidual{
         void SelectNewSuspectMeasurements();
 
         void HypothesisTestIdentification(float*,float*,float*,float*);
+        void HypothesisTestIdentification(float*,float*,float*,float*,float*,const int);
 
     private:
         int number_selected_measurements;
