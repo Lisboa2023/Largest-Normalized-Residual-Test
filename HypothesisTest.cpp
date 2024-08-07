@@ -40,11 +40,11 @@ void HypothesisTest::setNumberSelectedMeasurements(int numberSelectedMeasurement
 
 //Funcoes GET ===========================================================
 
-float HypothesisTest::setNBeta() const{
+float HypothesisTest::getNBeta() const{
     return N_beta;
 }
 
-float HypothesisTest::setNMaximus() const{
+float HypothesisTest::getNMaximus() const{
     return N_maximus;
 }
 

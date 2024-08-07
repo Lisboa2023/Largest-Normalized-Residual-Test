@@ -17,8 +17,8 @@ class HypothesisTest:public NormalizedResidual{
 
         //Funcoes GET ===========================================================
         int getNumberSelectedMeasurements() const;
-        float setNBeta() const;
-        float setNMaximus() const;
+        float getNBeta() const;
+        float getNMaximus() const;
 
         float *getSuspectSelectedMeasurements()const;
         float *getSuspectResidualCovarianceMatrix()const;
