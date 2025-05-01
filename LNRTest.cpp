@@ -52,7 +52,7 @@ int main(){
     float *gPtr = gainMatrix[0];
 
     NormalizedResidual LNRTest(size,threshold);
-    LNRTest.LargestNormalizedResidualTest(mPtr,emPtr,jPtr,gPtr,cmPtr,number_of_bus);
+    LNRTest.LargestNormalizedResidualTest(mPtr,emPtr,cmPtr);
     // =================================================================================
 
     return 0;

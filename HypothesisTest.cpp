@@ -341,7 +341,7 @@ void HypothesisTest::HypothesisTestIdentification(float *measurementArray, float
     
     CalculateHatMatrix(jacobianMatrix, gainMatrix, covarianceMatrix,length);
     CalculateSensitivityMatrix();
-    CalculateResidualCovarianceMatrix(covarianceMatrix);
+    setResidualCovarianceMatrix(covarianceMatrix);
     CalculateResidualMeasurements(measurementArray,estimatedArray);
     CalculateNormalizedResidualMeasurements();
 
